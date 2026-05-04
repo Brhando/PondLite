@@ -13,6 +13,39 @@ namespace PondLite.Api.Services
 
         public AuthResponse CreateAccount(CreateAccountRequest request)
         {
+            //validate input
+            if (string.IsNullOrWhiteSpace(request.Username))
+            {
+                throw new Exception("Username is required.");
+            }
+
+            if (string.IsNullOrWhiteSpace(request.Email))
+            {
+                throw new Exception("Email is required.");
+            }
+
+            if (string.IsNullOrWhiteSpace(request.Password))
+            {
+                throw new Exception("Password is required.");
+            }
+
+            bool usernameTaken = _users.Any(u =>
+                u.Username.Equals(request.Username, StringComparison.OrdinalIgnoreCase));
+
+            if (usernameTaken)
+            {
+                throw new Exception("Username is already taken.");
+            }
+
+            bool emailTaken = _users.Any(u =>
+                u.Email.Equals(request.Email, StringComparison.OrdinalIgnoreCase));
+
+            if (emailTaken)
+            {
+                throw new Exception("Email is already associated with an account.");
+            }
+
+            //create user
             UserAccount user = new UserAccount
             {
                 Username = request.Username,
@@ -30,9 +63,21 @@ namespace PondLite.Api.Services
 
         public AuthResponse Login(LoginRequest request)
         {
+            //input validation
+            if (string.IsNullOrWhiteSpace(request.UsernameOrEmail))
+            {
+                throw new Exception("Username or email is required.");
+            }
+
+            if (string.IsNullOrWhiteSpace(request.Password))
+            {
+                throw new Exception("Password is required.");
+            }
+
+            //case-insensitive search
             UserAccount? user = _users.FirstOrDefault(u =>
-                u.Username == request.UsernameOrEmail ||
-                u.Email == request.UsernameOrEmail);
+                 u.Username.Equals(request.UsernameOrEmail, StringComparison.OrdinalIgnoreCase) ||
+                 u.Email.Equals(request.UsernameOrEmail, StringComparison.OrdinalIgnoreCase));
 
             if (user == null)
             {
