@@ -1,15 +1,25 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using PondLite.Api.DTOs;
 using PondLite.Api.Models;
+using PondLite.Api.Repositories;
 
 namespace PondLite.Api.Services
 {
     public class AuthService : IAuthService
     {
-        private readonly List<UserAccount> _users = new();
-        private readonly List<AuthToken> _tokens = new();
+        private readonly IUserAccountRepository _userRepository;
+        private readonly IAuthTokenRepository _tokenRepository;
 
         private readonly PasswordHasher<UserAccount> _passwordHasher = new();
+
+        //constructor injection
+        public AuthService(
+                            IUserAccountRepository userRepository,
+                            IAuthTokenRepository tokenRepository)
+        {
+            _userRepository = userRepository;
+            _tokenRepository = tokenRepository;
+        }
 
         public AuthResponse CreateAccount(CreateAccountRequest request)
         {
@@ -29,16 +39,14 @@ namespace PondLite.Api.Services
                 throw new Exception("Password is required.");
             }
 
-            bool usernameTaken = _users.Any(u =>
-                u.Username.Equals(request.Username, StringComparison.OrdinalIgnoreCase));
+            bool usernameTaken = _userRepository.UsernameExists(request.Username);
 
             if (usernameTaken)
             {
                 throw new Exception("Username is already taken.");
             }
 
-            bool emailTaken = _users.Any(u =>
-                u.Email.Equals(request.Email, StringComparison.OrdinalIgnoreCase));
+            bool emailTaken = _userRepository.EmailExists(request.Email);
 
             if (emailTaken)
             {
@@ -54,7 +62,7 @@ namespace PondLite.Api.Services
 
             user.PasswordHash = _passwordHasher.HashPassword(user, request.Password);
 
-            _users.Add(user);
+            _userRepository.Add(user);
 
             AuthToken token = CreateTokenForUser(user);
 
@@ -75,9 +83,7 @@ namespace PondLite.Api.Services
             }
 
             //case-insensitive search
-            UserAccount? user = _users.FirstOrDefault(u =>
-                 u.Username.Equals(request.UsernameOrEmail, StringComparison.OrdinalIgnoreCase) ||
-                 u.Email.Equals(request.UsernameOrEmail, StringComparison.OrdinalIgnoreCase));
+            UserAccount? user = _userRepository.GetByUsernameOrEmail(request.UsernameOrEmail);
 
             if (user == null)
             {
@@ -99,7 +105,7 @@ namespace PondLite.Api.Services
 
         public bool Logout(string tokenValue)
         {
-            AuthToken? token = _tokens.FirstOrDefault(t => t.TokenValue == tokenValue);
+            AuthToken? token = _tokenRepository.GetByTokenValue(tokenValue);
 
             if (token == null)
             {
@@ -107,22 +113,21 @@ namespace PondLite.Api.Services
             }
 
             token.IsActive = false;
+            _tokenRepository.Update(token);
+
             return true;
         }
 
         public UserAccount? GetUserFromToken(string tokenValue)
         {
-            AuthToken? token = _tokens.FirstOrDefault(t =>
-                t.TokenValue == tokenValue &&
-                t.IsActive &&
-                t.ExpiresAt > DateTime.UtcNow);
+            AuthToken? token = _tokenRepository.GetActiveToken(tokenValue);
 
             if (token == null)
             {
                 return null;
             }
 
-            return _users.FirstOrDefault(u => u.AccountId == token.UserAccountId);
+            return _userRepository.GetById(token.UserAccountId);
         }
 
         private AuthToken CreateTokenForUser(UserAccount user)
@@ -136,7 +141,7 @@ namespace PondLite.Api.Services
                 IsActive = true
             };
 
-            _tokens.Add(token);
+            _tokenRepository.Add(token);
 
             return token;
         }
