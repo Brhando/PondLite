@@ -24,16 +24,17 @@ namespace PondLite.Api.Controllers
         public async Task<IActionResult> CreateRelationship(
             [FromBody] CreateRelationshipRequest request)
         {
-            var user = GetUserFromBearerToken();
+            UserAccount? user = GetUserFromBearerToken();
 
             if (user == null)
             {
                 return Unauthorized("Invalid or expired token.");
             }
 
-            var response = await _relationshipService.CreateRelationshipAsync(
-                user.AccountId,
-                request);
+            RelationshipResponse? response =
+                await _relationshipService.CreateRelationshipAsync(
+                    user.AccountId,
+                    request);
 
             if (response == null)
             {
@@ -46,15 +47,16 @@ namespace PondLite.Api.Controllers
         [HttpGet("mine")]
         public async Task<IActionResult> GetMyRelationship()
         {
-            var user = GetUserFromBearerToken();
+            UserAccount? user = GetUserFromBearerToken();
 
             if (user == null)
             {
                 return Unauthorized("Invalid or expired token.");
             }
 
-            var response = await _relationshipService.GetActiveRelationshipForUserAsync(
-                user.AccountId);
+            RelationshipResponse? response =
+                await _relationshipService.GetActiveRelationshipForUserAsync(
+                    user.AccountId);
 
             if (response == null)
             {
@@ -66,7 +68,7 @@ namespace PondLite.Api.Controllers
 
         private UserAccount? GetUserFromBearerToken()
         {
-            var authHeader = Request.Headers.Authorization.ToString();
+            string authHeader = Request.Headers.Authorization.ToString();
 
             if (string.IsNullOrWhiteSpace(authHeader) ||
                 !authHeader.StartsWith("Bearer "))
@@ -74,7 +76,7 @@ namespace PondLite.Api.Controllers
                 return null;
             }
 
-            var tokenValue = authHeader["Bearer ".Length..].Trim();
+            string tokenValue = authHeader["Bearer ".Length..].Trim();
 
             return _authService.GetUserFromToken(tokenValue);
         }
