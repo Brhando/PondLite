@@ -1,7 +1,10 @@
-﻿namespace PondLite.Api.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace PondLite.Api.Models
 {
     public class AuthToken
     {
+        [Key]
         public Guid TokenId { get; set; } = Guid.NewGuid();
 
         public Guid UserAccountId { get; set; }

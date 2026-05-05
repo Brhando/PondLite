@@ -1,7 +1,9 @@
-﻿namespace PondLite.Api.Models
+﻿using System.ComponentModel.DataAnnotations;
+namespace PondLite.Api.Models
 {
     public class UserAccount
     {
+        [Key]
         public Guid AccountId { get; set; } = Guid.NewGuid();
 
         public string Username { get; set; } = string.Empty;
