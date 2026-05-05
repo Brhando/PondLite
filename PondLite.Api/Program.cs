@@ -10,6 +10,7 @@ builder.Services.AddDbContext<PondLiteDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("PondLiteDb")));
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IRelationshipService, RelationshipService>();
+
 builder.Services.AddScoped<IUserAccountRepository, EfUserAccountRepository>();
 builder.Services.AddScoped<IAuthTokenRepository, EfAuthTokenRepository>();
 builder.Services.AddScoped<IRelationshipRepository, EfRelationshipRepository>();

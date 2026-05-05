@@ -1,32 +1,35 @@
-﻿using Microsoft.EntityFrameworkCore;
-using PondLite.Api.Data;
-using PondLite.Api.DTOs.Relationship;
+﻿using PondLite.Api.DTOs.Relationship;
 using PondLite.Api.Models;
+using PondLite.Api.Repositories;
 
 namespace PondLite.Api.Services
 {
     public class RelationshipService : IRelationshipService
     {
-        private readonly PondLiteDbContext _context;
+        private readonly IRelationshipRepository _relationshipRepository;
+        private readonly IRelationshipMemberRepository _relationshipMemberRepository;
 
-        public RelationshipService(PondLiteDbContext context)
+        public RelationshipService(
+            IRelationshipRepository relationshipRepository,
+            IRelationshipMemberRepository relationshipMemberRepository)
         {
-            _context = context;
+            _relationshipRepository = relationshipRepository;
+            _relationshipMemberRepository = relationshipMemberRepository;
         }
 
-        public async Task<RelationshipResponse?> CreateRelationshipAsync(
+        public Task<RelationshipResponse?> CreateRelationshipAsync(
             Guid userAccountId,
             CreateRelationshipRequest request)
         {
-            var existingMembership = await _context.RelationshipMembers
-                .FirstOrDefaultAsync(member => member.UserAccountId == userAccountId);
+            RelationshipMember? existingMembership =
+                _relationshipMemberRepository.GetByUserAccountId(userAccountId);
 
             if (existingMembership != null)
             {
-                return null;
+                return Task.FromResult<RelationshipResponse?>(null);
             }
 
-            var relationship = new Relationship
+            Relationship relationship = new Relationship
             {
                 Name = string.IsNullOrWhiteSpace(request.Name)
                     ? "Our Pond"
@@ -35,7 +38,7 @@ namespace PondLite.Api.Services
                 UpdatedAt = DateTime.UtcNow
             };
 
-            var relationshipMember = new RelationshipMember
+            RelationshipMember relationshipMember = new RelationshipMember
             {
                 RelationshipId = relationship.RelationshipId,
                 UserAccountId = userAccountId,
@@ -46,12 +49,10 @@ namespace PondLite.Api.Services
                 JoinedAt = DateTime.UtcNow
             };
 
-            _context.Relationships.Add(relationship);
-            _context.RelationshipMembers.Add(relationshipMember);
+            _relationshipRepository.Add(relationship);
+            _relationshipMemberRepository.Add(relationshipMember);
 
-            await _context.SaveChangesAsync();
-
-            return new RelationshipResponse
+            RelationshipResponse response = new RelationshipResponse
             {
                 RelationshipId = relationship.RelationshipId,
                 Name = relationship.Name,
@@ -60,21 +61,22 @@ namespace PondLite.Api.Services
                 Role = relationshipMember.Role,
                 JoinedAt = relationshipMember.JoinedAt
             };
+
+            return Task.FromResult<RelationshipResponse?>(response);
         }
 
-        public async Task<RelationshipResponse?> GetActiveRelationshipForUserAsync(
+        public Task<RelationshipResponse?> GetActiveRelationshipForUserAsync(
             Guid userAccountId)
         {
-            var membership = await _context.RelationshipMembers
-                .Include(member => member.Relationship)
-                .FirstOrDefaultAsync(member => member.UserAccountId == userAccountId);
+            RelationshipMember? membership =
+                _relationshipMemberRepository.GetByUserAccountIdWithRelationship(userAccountId);
 
             if (membership == null || membership.Relationship == null)
             {
-                return null;
+                return Task.FromResult<RelationshipResponse?>(null);
             }
 
-            return new RelationshipResponse
+            RelationshipResponse response = new RelationshipResponse
             {
                 RelationshipId = membership.Relationship.RelationshipId,
                 Name = membership.Relationship.Name,
@@ -83,16 +85,20 @@ namespace PondLite.Api.Services
                 Role = membership.Role,
                 JoinedAt = membership.JoinedAt
             };
+
+            return Task.FromResult<RelationshipResponse?>(response);
         }
 
-        public async Task<bool> UserBelongsToRelationshipAsync(
+        public Task<bool> UserBelongsToRelationshipAsync(
             Guid userAccountId,
             Guid relationshipId)
         {
-            return await _context.RelationshipMembers
-                .AnyAsync(member =>
-                    member.UserAccountId == userAccountId &&
-                    member.RelationshipId == relationshipId);
+            bool belongsToRelationship =
+                _relationshipMemberRepository.UserBelongsToRelationship(
+                    userAccountId,
+                    relationshipId);
+
+            return Task.FromResult(belongsToRelationship);
         }
     }
 }
