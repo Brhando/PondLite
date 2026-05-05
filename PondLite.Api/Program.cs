@@ -8,9 +8,9 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddDbContext<PondLiteDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("PondLiteDb")));
-builder.Services.AddSingleton<IAuthService, AuthService>();
-builder.Services.AddSingleton<IUserAccountRepository, InMemoryUserAccountRepository>();
-builder.Services.AddSingleton<IAuthTokenRepository, InMemoryAuthTokenRepository>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IUserAccountRepository, EfUserAccountRepository>();
+builder.Services.AddScoped<IAuthTokenRepository, EfAuthTokenRepository>();
 builder.Services.AddControllers();
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
