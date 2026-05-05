@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+
 namespace PondLite.Api.Models
 {
     public class UserAccount
@@ -14,5 +15,7 @@ namespace PondLite.Api.Models
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
+        public ICollection<RelationshipMember> RelationshipMembers { get; set; }
+            = new List<RelationshipMember>();
     }
 }
