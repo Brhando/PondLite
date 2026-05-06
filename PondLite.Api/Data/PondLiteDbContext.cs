@@ -30,6 +30,10 @@ namespace PondLite.Api.Data
                 .HasForeignKey(token => token.UserAccountId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            modelBuilder.Entity<UserAccount>()
+                .Property(user => user.AccountType)
+                .HasConversion<string>();
+
             modelBuilder.Entity<RelationshipMember>()
                 .HasOne(member => member.UserAccount)
                 .WithMany(user => user.RelationshipMembers)

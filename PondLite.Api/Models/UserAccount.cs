@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using PondLite.Api.Models.Enums;
 
 namespace PondLite.Api.Models
 {
@@ -6,6 +7,8 @@ namespace PondLite.Api.Models
     {
         [Key]
         public Guid AccountId { get; set; } = Guid.NewGuid();
+
+        public AccountType AccountType { get; set; } = AccountType.User;
 
         public string Username { get; set; } = string.Empty;
 
