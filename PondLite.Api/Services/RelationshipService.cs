@@ -1,6 +1,5 @@
 ﻿using PondLite.Api.DTOs.Relationship;
 using PondLite.Api.Models;
-using PondLite.Api.Models.Enums;
 using PondLite.Api.Repositories;
 
 namespace PondLite.Api.Services
@@ -9,19 +8,19 @@ namespace PondLite.Api.Services
     {
         private readonly IRelationshipRepository _relationshipRepository;
         private readonly IRelationshipMemberRepository _relationshipMemberRepository;
-        private readonly IFrogRepository _frogRepository;
+        private readonly IFrogService _frogService;
 
         public RelationshipService(
             IRelationshipRepository relationshipRepository,
             IRelationshipMemberRepository relationshipMemberRepository,
-            IFrogRepository frogRepository)
+            IFrogService frogService)
         {
             _relationshipRepository = relationshipRepository;
             _relationshipMemberRepository = relationshipMemberRepository;
-            _frogRepository = frogRepository;
+            _frogService = frogService;
         }
 
-        public Task<RelationshipResponse?> CreateRelationshipAsync(
+        public async Task<RelationshipResponse?> CreateRelationshipAsync(
             Guid userAccountId,
             CreateRelationshipRequest request)
         {
@@ -30,7 +29,7 @@ namespace PondLite.Api.Services
 
             if (existingMembership != null)
             {
-                return Task.FromResult<RelationshipResponse?>(null);
+                return null;
             }
 
             Relationship relationship = new Relationship
@@ -56,16 +55,8 @@ namespace PondLite.Api.Services
             _relationshipRepository.Add(relationship);
             _relationshipMemberRepository.Add(relationshipMember);
 
-            Frog frog = new Frog
-            {
-                RelationshipMemberId = relationshipMember.RelationshipMemberId,
-                Name = "Little Frog",
-                CurrentMood = FrogMood.None,
-                ActivityState = FrogActivityState.Asleep,
-                LastUpdatedAt = DateTime.UtcNow
-            };
-
-            _frogRepository.Add(frog);
+            await _frogService.CreateDefaultFrogForRelationshipMemberAsync(
+                relationshipMember.RelationshipMemberId);
 
             RelationshipResponse response = new RelationshipResponse
             {
@@ -77,7 +68,7 @@ namespace PondLite.Api.Services
                 JoinedAt = relationshipMember.JoinedAt
             };
 
-            return Task.FromResult<RelationshipResponse?>(response);
+            return response;
         }
 
         public Task<RelationshipResponse?> GetActiveRelationshipForUserAsync(

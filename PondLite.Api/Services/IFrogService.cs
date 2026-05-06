@@ -4,6 +4,9 @@ namespace PondLite.Api.Services
 {
     public interface IFrogService
     {
+        Task<FrogResponse> CreateDefaultFrogForRelationshipMemberAsync(
+            Guid relationshipMemberId);
+
         Task<FrogResponse?> GetMyFrogAsync(Guid userAccountId);
 
         Task<FrogResponse?> UpdateMyFrogAsync(

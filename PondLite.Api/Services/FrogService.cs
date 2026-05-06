@@ -1,5 +1,6 @@
 using PondLite.Api.DTOs.Frogs;
 using PondLite.Api.Models;
+using PondLite.Api.Models.Enums;
 using PondLite.Api.Repositories;
 
 namespace PondLite.Api.Services
@@ -15,6 +16,24 @@ namespace PondLite.Api.Services
         {
             _frogRepository = frogRepository;
             _relationshipMemberRepository = relationshipMemberRepository;
+        }
+
+        public Task<FrogResponse> CreateDefaultFrogForRelationshipMemberAsync(
+            Guid relationshipMemberId)
+        {
+            Frog? existingFrog =
+                _frogRepository.GetByRelationshipMemberId(relationshipMemberId);
+
+            if (existingFrog != null)
+            {
+                return Task.FromResult(BuildFrogResponse(existingFrog));
+            }
+
+            Frog frog = CreateDefaultFrog(relationshipMemberId);
+
+            _frogRepository.Add(frog);
+
+            return Task.FromResult(BuildFrogResponse(frog));
         }
 
         public Task<FrogResponse?> GetMyFrogAsync(Guid userAccountId)
@@ -33,7 +52,8 @@ namespace PondLite.Api.Services
 
             if (frog == null)
             {
-                return Task.FromResult<FrogResponse?>(null);
+                frog = CreateDefaultFrog(relationshipMember.RelationshipMemberId);
+                _frogRepository.Add(frog);
             }
 
             FrogResponse response = BuildFrogResponse(frog);
@@ -59,7 +79,8 @@ namespace PondLite.Api.Services
 
             if (frog == null)
             {
-                return Task.FromResult<FrogResponse?>(null);
+                frog = CreateDefaultFrog(relationshipMember.RelationshipMemberId);
+                _frogRepository.Add(frog);
             }
 
             frog.Name = request.Name.Trim();
@@ -82,6 +103,18 @@ namespace PondLite.Api.Services
                 CurrentMood = frog.CurrentMood.ToString(),
                 ActivityState = frog.ActivityState.ToString(),
                 LastUpdatedAt = frog.LastUpdatedAt
+            };
+        }
+
+        private static Frog CreateDefaultFrog(Guid relationshipMemberId)
+        {
+            return new Frog
+            {
+                RelationshipMemberId = relationshipMemberId,
+                Name = "Little Frog",
+                CurrentMood = FrogMood.None,
+                ActivityState = FrogActivityState.Asleep,
+                LastUpdatedAt = DateTime.UtcNow
             };
         }
     }
