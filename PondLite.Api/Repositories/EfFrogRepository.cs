@@ -17,5 +17,12 @@ namespace PondLite.Api.Repositories
             _context.Frogs.Add(frog);
             _context.SaveChanges();
         }
+
+        public Frog? GetByRelationshipMemberId(Guid relationshipMemberId)
+        {
+            return _context.Frogs
+                .FirstOrDefault(frog =>
+                    frog.RelationshipMemberId == relationshipMemberId);
+        }
     }
 }
