@@ -23,5 +23,7 @@ namespace PondLite.Api.Models
         public string Role { get; set; } = "Member";
 
         public DateTime JoinedAt { get; set; } = DateTime.UtcNow;
+
+        public Frog? Frog { get; set; }
     }
 }

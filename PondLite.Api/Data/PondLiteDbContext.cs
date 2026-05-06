@@ -18,6 +18,8 @@ namespace PondLite.Api.Data
 
         public DbSet<RelationshipMember> RelationshipMembers { get; set; }
 
+        public DbSet<Frog> Frogs { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -43,6 +45,24 @@ namespace PondLite.Api.Data
             modelBuilder.Entity<RelationshipMember>()
                 .HasIndex(member => new { member.RelationshipId, member.UserAccountId })
                 .IsUnique();
+
+            modelBuilder.Entity<Frog>()
+                .HasOne(frog => frog.RelationshipMember)
+                .WithOne(member => member.Frog)
+                .HasForeignKey<Frog>(frog => frog.RelationshipMemberId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Frog>()
+                .HasIndex(frog => frog.RelationshipMemberId)
+                .IsUnique();
+
+            modelBuilder.Entity<Frog>()
+                .Property(frog => frog.CurrentMood)
+                .HasConversion<string>();
+
+            modelBuilder.Entity<Frog>()
+                .Property(frog => frog.ActivityState)
+                .HasConversion<string>();
         }
     }
 }
