@@ -23,10 +23,11 @@ Completed:
 - Phase 1: Authentication Foundation
 - Phase 2: Relationship/Pond Foundation
 - Phase 3: Frog Foundation
+- Phase 4: Daily Check-In
 
 Next planned phase:
 
-- Phase 4: Daily Check-In
+- Phase 5: Ribbits / Gentle Reminders
 
 There is no frontend yet.
 
@@ -146,6 +147,27 @@ Current Frog defaults:
 `CurrentMood` and `ActivityState` are C# enums stored as readable text in
 PostgreSQL.
 
+### DailyCheckIn
+
+Represents one PondMate's emotional check-in for a specific day inside a
+Relationship/Pond.
+
+- `DailyCheckInId`
+- `RelationshipId`
+- `UserAccountId`
+- `CheckInDate`
+- `PrimaryEmotion`
+- `SecondaryEmotion`
+- `TertiaryEmotion`
+- `OptionalMessage`
+- `CreatedAt`
+- `UpdatedAt`
+- `Relationship`
+- `UserAccount`
+
+Daily check-ins are unique by `RelationshipId`, `UserAccountId`, and
+`CheckInDate`, so a PondMate can only create one check-in per Pond per day.
+
 ---
 
 ## Implemented Endpoints
@@ -176,8 +198,8 @@ GET  /api/relationship/mine
 
 ```http
 POST /api/frog/mine
-GET /api/frog/mine
-PUT /api/frog/mine
+GET  /api/frog/mine
+PUT  /api/frog/mine
 ```
 
 `POST /api/frog/mine` creates or returns the authenticated PondMate's default
@@ -196,6 +218,39 @@ Example update body:
   "name": "Sprout"
 }
 ```
+
+### Daily Check-In
+
+```http
+POST /api/relationships/{relationshipId}/checkins
+GET  /api/relationships/{relationshipId}/checkins/today/me
+GET  /api/relationships/{relationshipId}/checkins/today
+```
+
+`POST /api/relationships/{relationshipId}/checkins` creates today's check-in
+for the authenticated PondMate.
+
+`GET /api/relationships/{relationshipId}/checkins/today/me` returns the
+authenticated PondMate's check-in for today.
+
+`GET /api/relationships/{relationshipId}/checkins/today` returns today's
+check-in status for the Pond's members.
+
+Example create body:
+
+```json
+{
+  "primaryEmotion": "Happy",
+  "secondaryEmotion": "Grateful",
+  "tertiaryEmotion": "Hopeful",
+  "optionalMessage": "Feeling pretty good today and glad we are building this together."
+}
+```
+
+Creating a daily check-in also updates the authenticated PondMate's Frog:
+
+- `CurrentMood` is mapped from the primary emotion.
+- `ActivityState` becomes `Active`.
 
 Protected endpoints use:
 
@@ -266,9 +321,9 @@ Bearer token -> UserAccount -> RelationshipMember -> Frog
 The Frog endpoints do not accept arbitrary Frog IDs. They operate on the
 authenticated user's own Frog through their RelationshipMember record.
 
-### Phase 4: Daily Check-In - Next
+### Phase 4: Daily Check-In - Complete
 
-Planned:
+Implemented:
 
 - `DailyCheckIn` model
 - Emotion enum
@@ -278,6 +333,35 @@ Planned:
 - Check-in creation endpoint
 - Today's check-in status endpoint
 - Update Frog mood/activity state after check-in
+- Daily check-in repository
+- Daily check-in service
+- Daily check-in response DTOs
+- PondMate check-in status DTO
+- EF migration and unique constraint
+- Postman tests for create, duplicate prevention, retrieval, Pond status, Frog update, and unauthorized access
+
+Daily check-in privacy path:
+
+```text
+Bearer token -> UserAccount -> RelationshipMember -> Relationship -> DailyCheckIn
+```
+
+Check-in endpoints require the authenticated user to be a member of the
+requested Relationship/Pond.
+
+### Phase 5: Ribbits / Gentle Reminders - Next
+
+Planned:
+
+- `Ribbit` model
+- Ribbit type enum
+- Ribbit status enum
+- Sender and receiver membership validation
+- Create/send Ribbit endpoint
+- Retrieve active Ribbits for a PondMate
+- Acknowledge Ribbit endpoint
+- Complete, decline, or cancel Ribbit behavior where applicable
+- Frog notification indicator for unacknowledged Ribbits
 
 ---
 
@@ -298,6 +382,11 @@ Recommended high-level test order:
 5. Get my Pond
 6. Get my Frog
 7. Update my Frog
+8. Create daily check-in
+9. Confirm duplicate check-in is blocked
+10. Get my today check-in
+11. Get Pond check-in status
+12. Confirm Frog state updated after check-in
 
 The collection uses variables such as:
 
@@ -309,6 +398,7 @@ The collection uses variables such as:
 - `relationshipId`
 - `frogId`
 - `frogName`
+- `dailyCheckInId`
 
 ---
 
