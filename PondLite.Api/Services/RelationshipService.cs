@@ -1,5 +1,6 @@
 ﻿using PondLite.Api.DTOs.Relationship;
 using PondLite.Api.Models;
+using PondLite.Api.Models.Enums;
 using PondLite.Api.Repositories;
 
 namespace PondLite.Api.Services
@@ -8,13 +9,16 @@ namespace PondLite.Api.Services
     {
         private readonly IRelationshipRepository _relationshipRepository;
         private readonly IRelationshipMemberRepository _relationshipMemberRepository;
+        private readonly IFrogRepository _frogRepository;
 
         public RelationshipService(
             IRelationshipRepository relationshipRepository,
-            IRelationshipMemberRepository relationshipMemberRepository)
+            IRelationshipMemberRepository relationshipMemberRepository,
+            IFrogRepository frogRepository)
         {
             _relationshipRepository = relationshipRepository;
             _relationshipMemberRepository = relationshipMemberRepository;
+            _frogRepository = frogRepository;
         }
 
         public Task<RelationshipResponse?> CreateRelationshipAsync(
@@ -51,6 +55,17 @@ namespace PondLite.Api.Services
 
             _relationshipRepository.Add(relationship);
             _relationshipMemberRepository.Add(relationshipMember);
+
+            Frog frog = new Frog
+            {
+                RelationshipMemberId = relationshipMember.RelationshipMemberId,
+                Name = "Little Frog",
+                CurrentMood = FrogMood.None,
+                ActivityState = FrogActivityState.Asleep,
+                LastUpdatedAt = DateTime.UtcNow
+            };
+
+            _frogRepository.Add(frog);
 
             RelationshipResponse response = new RelationshipResponse
             {

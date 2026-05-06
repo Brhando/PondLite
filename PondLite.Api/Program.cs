@@ -15,6 +15,7 @@ builder.Services.AddScoped<IUserAccountRepository, EfUserAccountRepository>();
 builder.Services.AddScoped<IAuthTokenRepository, EfAuthTokenRepository>();
 builder.Services.AddScoped<IRelationshipRepository, EfRelationshipRepository>();
 builder.Services.AddScoped<IRelationshipMemberRepository, EfRelationshipMemberRepository>();
+builder.Services.AddScoped<IFrogRepository, EfFrogRepository>();
 builder.Services.AddControllers();
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
