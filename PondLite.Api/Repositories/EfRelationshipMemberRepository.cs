@@ -45,5 +45,12 @@ namespace PondLite.Api.Repositories
                 member.RelationshipId == relationshipId &&
                 member.UserAccountId == userAccountId);
         }
+
+        public List<RelationshipMember> GetByRelationshipId(Guid relationshipId)
+        {
+            return _context.RelationshipMembers
+                .Where(member => member.RelationshipId == relationshipId)
+                .ToList();
+        }
     }
 }

@@ -1491,6 +1491,487 @@
           "response": []
         }
       ]
+    },
+    {
+      "name": "Daily Check-In Tests",
+      "item": [
+        {
+          "name": "Daily Check-In Login Success",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response includes auth token\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "\r",
+                  "    pm.expect(json.token).to.exist;\r",
+                  "    pm.expect(json.userAccountId).to.exist;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Store token\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "pm.collectionVariables.set(\"token\", json.token);\r",
+                  "if (pm.environment.name) { pm.environment.set(\"token\", json.token); }\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"usernameOrEmail\": \"{{testUsername}}\",\r\n  \"password\": \"{{testPassword}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Daily Check-In Get Active Pond",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response includes relationshipId\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "\r",
+                  "    pm.expect(json.relationshipId).to.exist;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Store relationshipId\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "pm.collectionVariables.set(\"relationshipId\", json.relationshipId);\r",
+                  "if (pm.environment.name) { pm.environment.set(\"relationshipId\", json.relationshipId); }\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/relationship/mine",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "relationship",
+                "mine"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Daily Check-In Success",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response includes created daily check-in\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "\r",
+                  "    pm.expect(json.dailyCheckInId).to.exist;\r",
+                  "    pm.expect(json.relationshipId).to.eql(pm.collectionVariables.get(\"relationshipId\"));\r",
+                  "    pm.expect(json.primaryEmotion).to.eql(\"Happy\");\r",
+                  "    pm.expect(json.secondaryEmotion).to.eql(\"Grateful\");\r",
+                  "    pm.expect(json.tertiaryEmotion).to.eql(\"Hopeful\");\r",
+                  "    pm.expect(json.optionalMessage).to.eql(\"Feeling pretty good today and glad we are building this together.\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Store dailyCheckInId\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "pm.collectionVariables.set(\"dailyCheckInId\", json.dailyCheckInId);\r",
+                  "if (pm.environment.name) { pm.environment.set(\"dailyCheckInId\", json.dailyCheckInId); }\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"primaryEmotion\": \"Happy\",\n  \"secondaryEmotion\": \"Grateful\",\n  \"tertiaryEmotion\": \"Hopeful\",\n  \"optionalMessage\": \"Feeling pretty good today and glad we are building this together.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/relationships/{{relationshipId}}/checkins",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "relationships",
+                "{{relationshipId}}",
+                "checkins"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Prevent Duplicate Daily Check-In",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400 Bad Request\", function () {\r",
+                  "    pm.response.to.have.status(400);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response explains duplicate or blocked check-in\", function () {\r",
+                  "    const body = pm.response.text().toLowerCase();\r",
+                  "\r",
+                  "    pm.expect(body).to.satisfy(function (text) {\r",
+                  "        return text.includes(\"already checked in\") ||\r",
+                  "            text.includes(\"unable to create\") ||\r",
+                  "            text.includes(\"cannot create\");\r",
+                  "    });\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"primaryEmotion\": \"Happy\",\n  \"secondaryEmotion\": \"Grateful\",\n  \"tertiaryEmotion\": \"Hopeful\",\n  \"optionalMessage\": \"Feeling pretty good today and glad we are building this together.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/relationships/{{relationshipId}}/checkins",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "relationships",
+                "{{relationshipId}}",
+                "checkins"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get My Today Check-In",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response includes today check-in\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "    const todayUtc = new Date().toISOString().slice(0, 10);\r",
+                  "\r",
+                  "    pm.expect(json.relationshipId).to.eql(pm.collectionVariables.get(\"relationshipId\"));\r",
+                  "    pm.expect(json.primaryEmotion).to.eql(\"Happy\");\r",
+                  "    pm.expect(json.checkInDate).to.eql(todayUtc);\r",
+                  "    pm.expect(json.optionalMessage).to.eql(\"Feeling pretty good today and glad we are building this together.\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/relationships/{{relationshipId}}/checkins/today/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "relationships",
+                "{{relationshipId}}",
+                "checkins",
+                "today",
+                "me"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Pond Check-In Status",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response is an array\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "\r",
+                  "    pm.expect(json).to.be.an(\"array\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"At least one PondMate checked in today\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "\r",
+                  "    pm.expect(json.some(item => item.hasCheckedInToday === true)).to.eql(true);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"At least one status includes todayCheckIn\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "\r",
+                  "    pm.expect(json.some(item => item.todayCheckIn !== null)).to.eql(true);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/relationships/{{relationshipId}}/checkins/today",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "relationships",
+                "{{relationshipId}}",
+                "checkins",
+                "today"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Confirm Frog Updated After Check-In",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Frog mood reflects Happy check-in\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "\r",
+                  "    pm.expect([\"Happy\", \"Calm\", \"Loving\", \"Excited\"]).to.include(json.currentMood);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Frog is active after check-in\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "\r",
+                  "    pm.expect(json.activityState).to.eql(\"Active\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/frog/mine",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "frog",
+                "mine"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Daily Check-In Unauthorized Missing Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 401 Unauthorized\", function () {\r",
+                  "    pm.response.to.have.status(401);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/relationships/{{relationshipId}}/checkins/today/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "relationships",
+                "{{relationshipId}}",
+                "checkins",
+                "today",
+                "me"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
     }
   ],
   "event": [
@@ -1581,6 +2062,10 @@
     {
       "key": "frogName",
       "value": "Sprout"
+    },
+    {
+      "key": "dailyCheckInId",
+      "value": ""
     }
   ]
 }

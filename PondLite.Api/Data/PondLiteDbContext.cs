@@ -20,20 +20,25 @@ namespace PondLite.Api.Data
 
         public DbSet<Frog> Frogs { get; set; }
 
+        public DbSet<DailyCheckIn> DailyCheckIns { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
+            // - - -AuthToken- - -
             modelBuilder.Entity<AuthToken>()
                 .HasOne(token => token.UserAccount)
                 .WithMany()
                 .HasForeignKey(token => token.UserAccountId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            // - - -UserAccount- - -
             modelBuilder.Entity<UserAccount>()
                 .Property(user => user.AccountType)
                 .HasConversion<string>();
 
+            // - - -RelationshipMember- - -
             modelBuilder.Entity<RelationshipMember>()
                 .HasOne(member => member.UserAccount)
                 .WithMany(user => user.RelationshipMembers)
@@ -50,6 +55,7 @@ namespace PondLite.Api.Data
                 .HasIndex(member => new { member.RelationshipId, member.UserAccountId })
                 .IsUnique();
 
+            // - - -Frog- - -
             modelBuilder.Entity<Frog>()
                 .HasOne(frog => frog.RelationshipMember)
                 .WithOne(member => member.Frog)
@@ -66,6 +72,40 @@ namespace PondLite.Api.Data
 
             modelBuilder.Entity<Frog>()
                 .Property(frog => frog.ActivityState)
+                .HasConversion<string>();
+
+            // - - -DailyCheckIn- - -
+            modelBuilder.Entity<DailyCheckIn>()
+                .HasOne(checkIn => checkIn.Relationship)
+                .WithMany()
+                .HasForeignKey(checkIn => checkIn.RelationshipId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<DailyCheckIn>()
+                .HasOne(checkIn => checkIn.UserAccount)
+                .WithMany()
+                .HasForeignKey(checkIn => checkIn.UserAccountId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<DailyCheckIn>()
+                .HasIndex(checkIn => new
+                {
+                    checkIn.RelationshipId,
+                    checkIn.UserAccountId,
+                    checkIn.CheckInDate
+                })
+                .IsUnique();
+
+            modelBuilder.Entity<DailyCheckIn>()
+                .Property(checkIn => checkIn.PrimaryEmotion)
+                .HasConversion<string>();
+
+            modelBuilder.Entity<DailyCheckIn>()
+                .Property(checkIn => checkIn.SecondaryEmotion)
+                .HasConversion<string>();
+
+            modelBuilder.Entity<DailyCheckIn>()
+                .Property(checkIn => checkIn.TertiaryEmotion)
                 .HasConversion<string>();
         }
     }

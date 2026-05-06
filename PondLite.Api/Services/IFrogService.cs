@@ -1,4 +1,5 @@
 using PondLite.Api.DTOs.Frogs;
+using PondLite.Api.Models.Enums;
 
 namespace PondLite.Api.Services
 {
@@ -14,5 +15,9 @@ namespace PondLite.Api.Services
         Task<FrogResponse?> UpdateMyFrogAsync(
             Guid userAccountId,
             UpdateFrogRequest request);
+
+        Task<FrogResponse?> UpdateFrogAfterCheckInAsync(
+            Guid relationshipMemberId,
+            Emotion primaryEmotion);
     }
 }

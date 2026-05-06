@@ -13,5 +13,7 @@ namespace PondLite.Api.Repositories
         bool UserBelongsToRelationship(Guid userAccountId, Guid relationshipId);
 
         bool RelationshipHasMember(Guid relationshipId, Guid userAccountId);
+
+        List<RelationshipMember> GetByRelationshipId(Guid relationshipId);
     }
 }

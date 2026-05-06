@@ -11,12 +11,14 @@ builder.Services.AddDbContext<PondLiteDbContext>(options =>
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IRelationshipService, RelationshipService>();
 builder.Services.AddScoped<IFrogService, FrogService>();
+builder.Services.AddScoped<IDailyCheckInService, DailyCheckInService>();
 
 builder.Services.AddScoped<IUserAccountRepository, EfUserAccountRepository>();
 builder.Services.AddScoped<IAuthTokenRepository, EfAuthTokenRepository>();
 builder.Services.AddScoped<IRelationshipRepository, EfRelationshipRepository>();
 builder.Services.AddScoped<IRelationshipMemberRepository, EfRelationshipMemberRepository>();
 builder.Services.AddScoped<IFrogRepository, EfFrogRepository>();
+builder.Services.AddScoped<IDailyCheckInRepository, EfDailyCheckInRepository>();
 builder.Services.AddControllers();
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi

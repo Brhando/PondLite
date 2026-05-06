@@ -41,6 +41,8 @@ namespace PondLite.Api.Controllers
             return Ok(response);
         }
 
+        // Temporary developer/recovery endpoint.
+        // Normal frog creation happens automatically when a RelationshipMember is created.
         [HttpPost("mine")]
         public async Task<IActionResult> CreateMyFrog()
         {
