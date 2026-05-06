@@ -7,5 +7,7 @@ namespace PondLite.Api.Repositories
         void Add(Frog frog);
 
         Frog? GetByRelationshipMemberId(Guid relationshipMemberId);
+
+        void Update(Frog frog);
     }
 }

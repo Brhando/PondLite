@@ -24,5 +24,11 @@ namespace PondLite.Api.Repositories
                 .FirstOrDefault(frog =>
                     frog.RelationshipMemberId == relationshipMemberId);
         }
+
+        public void Update(Frog frog)
+        {
+            _context.Frogs.Update(frog);
+            _context.SaveChanges();
+        }
     }
 }

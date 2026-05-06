@@ -36,7 +36,45 @@ namespace PondLite.Api.Services
                 return Task.FromResult<FrogResponse?>(null);
             }
 
-            FrogResponse response = new FrogResponse
+            FrogResponse response = BuildFrogResponse(frog);
+
+            return Task.FromResult<FrogResponse?>(response);
+        }
+
+        public Task<FrogResponse?> UpdateMyFrogAsync(
+            Guid userAccountId,
+            UpdateFrogRequest request)
+        {
+            RelationshipMember? relationshipMember =
+                _relationshipMemberRepository.GetByUserAccountId(userAccountId);
+
+            if (relationshipMember == null)
+            {
+                return Task.FromResult<FrogResponse?>(null);
+            }
+
+            Frog? frog =
+                _frogRepository.GetByRelationshipMemberId(
+                    relationshipMember.RelationshipMemberId);
+
+            if (frog == null)
+            {
+                return Task.FromResult<FrogResponse?>(null);
+            }
+
+            frog.Name = request.Name.Trim();
+            frog.LastUpdatedAt = DateTime.UtcNow;
+
+            _frogRepository.Update(frog);
+
+            FrogResponse response = BuildFrogResponse(frog);
+
+            return Task.FromResult<FrogResponse?>(response);
+        }
+
+        private static FrogResponse BuildFrogResponse(Frog frog)
+        {
+            return new FrogResponse
             {
                 FrogId = frog.FrogId,
                 RelationshipMemberId = frog.RelationshipMemberId,
@@ -45,8 +83,6 @@ namespace PondLite.Api.Services
                 ActivityState = frog.ActivityState.ToString(),
                 LastUpdatedAt = frog.LastUpdatedAt
             };
-
-            return Task.FromResult<FrogResponse?>(response);
         }
     }
 }

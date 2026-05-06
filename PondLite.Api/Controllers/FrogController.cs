@@ -41,6 +41,35 @@ namespace PondLite.Api.Controllers
             return Ok(response);
         }
 
+        [HttpPut("mine")]
+        public async Task<IActionResult> UpdateMyFrog(
+            [FromBody] UpdateFrogRequest request)
+        {
+            UserAccount? user = GetUserFromBearerToken();
+
+            if (user == null)
+            {
+                return Unauthorized("Invalid or expired token.");
+            }
+
+            if (string.IsNullOrWhiteSpace(request.Name))
+            {
+                return BadRequest("Frog name is required.");
+            }
+
+            FrogResponse? response =
+                await _frogService.UpdateMyFrogAsync(
+                    user.AccountId,
+                    request);
+
+            if (response == null)
+            {
+                return NotFound("No Frog found for this PondMate.");
+            }
+
+            return Ok(response);
+        }
+
         private UserAccount? GetUserFromBearerToken()
         {
             string authHeader = Request.Headers.Authorization.ToString();

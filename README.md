@@ -1,121 +1,75 @@
 # PondLite
 
-PondLite is a low-pressure relationship connection app designed to help partners stay emotionally connected throughout the day without turning care into a chore. The goal is to create a small, meaningful app where users can complete daily emotional check-ins, view a shared “pond,” send gentle reminders/ribbits, respond to discussion prompts, and eventually receive smart connection suggestions from an AI assistant.
+PondLite is a gentle, private relationship app for couples. The backend/domain
+term is `Relationship`; the user-facing term is `Pond`. People connected to the
+same Pond are `RelationshipMember`s in the backend and PondMates in the product
+language.
 
-This project is also being used as a personal learning project to practice full-stack application development with a Microsoft/.NET-focused backend stack.
+The app is designed to help partners stay connected through small, low-pressure
+moments: daily check-ins, shared frog states, Ribbits, bug gifts, optional
+discussion prompts, and eventually a Smart Connection Assistant.
 
----
-
-## Project Goals
-
-The main goals of PondLite are to:
-
-- Help partners stay connected in a gentle, non-punitive way
-- Support daily emotional check-ins using selected emotions and optional messages
-- Represent the relationship through a shared pond and frog state
-- Allow small reminders or “ribbits” between partners
-- Provide daily discussion prompts
-- Explore an AI-powered smart connection assistant
-- Practice backend architecture using ASP.NET Core, EF Core, PostgreSQL, repositories, DTOs, and service layers
+This is also a learning project focused on ASP.NET Core, C#, Entity Framework
+Core, PostgreSQL, layered backend architecture, and Postman-based API testing.
 
 ---
 
 ## Current Status
 
-Phase 1, **Authentication**, is complete.
+Backend Split I is in progress.
 
-The project currently includes:
+Completed:
 
-- ASP.NET Core Web API backend
-- PostgreSQL database integration
-- Entity Framework Core migrations
-- Repository layer
-- User account creation
-- Login
-- Logout
-- Bearer token generation
-- Server-side token validation
-- Password hashing
-- Protected current-user lookup endpoint
-- Postman-tested authentication flow
+- Phase 1: Authentication Foundation
+- Phase 2: Relationship/Pond Foundation
+- Phase 3: Frog Foundation
 
-Current implemented endpoints include:
+Next planned phase:
 
-```http
-GET  /api/health
-POST /api/auth/register
-POST /api/auth/login
-POST /api/auth/logout
-GET  /api/auth/me
-```
+- Phase 4: Daily Check-In
+
+There is no frontend yet.
 
 ---
 
 ## Tech Stack
 
-### Backend
-
 - C#
 - ASP.NET Core Web API
 - Entity Framework Core
 - PostgreSQL
-- Npgsql PostgreSQL EF Core provider
-- ASP.NET Core password hashing utilities
+- Npgsql EF Core provider
+- Manual bearer-token authentication for early development
 - Repository/service/controller architecture
-
-### Development Tools
-
-- Visual Studio
-- pgAdmin 4
-- Postman
-- Git/GitHub
-
-### Planned Frontend
-
-The frontend has not been implemented yet. Possible frontend paths include:
-
-- React
-- Blazor
-- Mobile-friendly web app / PWA
-- Future native or hybrid mobile deployment option
+- Postman for manual API testing
 
 ---
 
-## Architecture Overview
+## Architecture
 
-The current backend follows a layered structure:
-
-```text
-Controllers
-    ↓
-Services / Interfaces
-    ↓
-Repositories / Interfaces
-    ↓
-Entity Framework Core DbContext
-    ↓
-PostgreSQL
-```
-
-Current authentication flow:
+The backend follows this flow:
 
 ```text
-AuthController
-    ↓
-IAuthService
-    ↓
-AuthService
-    ↓
-IUserAccountRepository / IAuthTokenRepository
-    ↓
-EfUserAccountRepository / EfAuthTokenRepository
-    ↓
-PondLiteDbContext
-    ↓
-PostgreSQL
+Controller
+    -> Service
+    -> Repository
+    -> PondLiteDbContext
+    -> PostgreSQL
 ```
 
-This structure keeps HTTP handling, business logic, and data access separated.
+Controllers receive HTTP requests and stay thin. Services hold business rules.
+Repositories handle database access. DTOs shape request and response data, and
+EF entities are not returned directly from controllers.
+
+Privacy rule:
+
+```text
+Authentication answers: Who is this user?
+RelationshipMember answers: What Pond can this user access?
+```
+
+Relationship/Pond-owned data must be checked through membership before it is
+returned, created, updated, or deleted.
 
 ---
 
@@ -123,134 +77,123 @@ This structure keeps HTTP handling, business logic, and data access separated.
 
 ### UserAccount
 
-Represents a registered PondLite user.
+Represents a registered user.
 
-Current fields include:
-
-- AccountId
-- Username
-- Email
-- PasswordHash
-- CreatedAt
+- `AccountId`
+- `Username`
+- `Email`
+- `PasswordHash`
+- `CreatedAt`
+- `RelationshipMembers`
 
 ### AuthToken
 
-Represents an active or expired login/session token.
+Represents an active or expired login token.
 
-Current fields include:
+- `TokenId`
+- `UserAccountId`
+- `TokenValue`
+- `CreatedAt`
+- `ExpiresAt`
+- `IsActive`
+- `UserAccount`
 
-- TokenId
-- UserAccountId
-- TokenValue
-- CreatedAt
-- ExpiresAt
-- IsActive
+### Relationship
 
----
+Represents the private backend data boundary for a couple. In the UI this is a
+Pond.
 
-## Development Phases
+- `RelationshipId`
+- `Name`
+- `CreatedAt`
+- `UpdatedAt`
+- `Members`
 
-### Phase 1: Auth — Complete
+### RelationshipMember
 
-Implemented:
+Connects a user account to a Relationship/Pond.
 
-- UserAccount
-- AuthToken
-- Create account
-- Login
-- Logout
-- Bearer token creation
-- Token validation
-- Password hashing
-- PostgreSQL persistence
+- `RelationshipMemberId`
+- `RelationshipId`
+- `UserAccountId`
+- `DisplayName`
+- `Role`
+- `JoinedAt`
+- `Relationship`
+- `UserAccount`
+- `Frog`
 
-### Phase 2: Pond Foundation — Next
+Current v1 behavior supports one active Pond per user.
 
-Planned models/features:
+### Frog
 
-- Pond
-- PondMember
-- Frog
+Represents a PondMate's emotional avatar.
 
-This phase will establish the shared relationship space that both users belong to.
+- `FrogId`
+- `RelationshipMemberId`
+- `Name`
+- `CurrentMood`
+- `ActivityState`
+- `LastUpdatedAt`
+- `RelationshipMember`
 
-### Phase 3: Daily Check-In
+Current Frog defaults:
 
-Planned models/features:
+- `Name`: `Little Frog`
+- `CurrentMood`: `None`
+- `ActivityState`: `Asleep`
 
-- DailyCheckIn
-- Emotion enum
-- Frog mood update logic
-
-Users will be able to complete a daily check-in by selecting emotions and optionally writing a short message.
-
-### Phase 4: Reminder/Ribbit
-
-Planned models/features:
-
-- ReminderRibbit
-- ReminderStatus enum
-- ReminderType enum
-
-Users will be able to send small reminders or “ribbits” to their PondMate.
-
-### Phase 5: Discussion Prompt
-
-Planned models/features:
-
-- DiscussionPrompt
-- DiscussionResponse
-
-Users will be able to answer daily prompts and view each other’s responses.
-
-### Phase 6: Smart Connection Assistant
-
-Planned models/features:
-
-- SmartConnectionSuggestion
-- AI request/response DTOs
-
-This feature will use recent relationship context to suggest care actions, message ideas, or discussion prompts.
+`CurrentMood` and `ActivityState` are C# enums stored as readable text in
+PostgreSQL.
 
 ---
 
-## Local Development Notes
+## Implemented Endpoints
 
-The app currently uses a local PostgreSQL database.
+### Health
 
-Database connection strings are managed through **User Secrets** and should not be committed to GitHub.
-
-The local database is currently expected to be named:
-
-```text
-pondlite_db
+```http
+GET /api/health
 ```
 
-The database schema is managed through Entity Framework Core migrations.
+### Auth
 
-Common EF Core commands:
-
-```powershell
-Add-Migration InitialCreate
-Update-Database
+```http
+POST /api/auth/register
+POST /api/auth/login
+POST /api/auth/logout
+GET  /api/auth/me
 ```
 
----
+### Relationship/Pond
 
-## Current Testing Flow
+```http
+POST /api/relationship/create
+GET  /api/relationship/mine
+```
 
-The current auth flow has been tested manually in Postman.
+### Frog
 
-Recommended test order:
+```http
+GET /api/frog/mine
+PUT /api/frog/mine
+```
 
-1. Register a new user
-2. Log in as that user
-3. Copy the returned bearer token
-4. Call `/api/auth/me` with the token
-5. Log out with the token
-6. Call `/api/auth/me` again and confirm the token is invalid
+`GET /api/frog/mine` returns the authenticated PondMate's Frog.
 
-Bearer token format:
+`PUT /api/frog/mine` currently updates only the Frog name. Mood and activity
+state are intentionally system-controlled so future check-in, Ribbit, and bug
+gift behavior can update them safely.
+
+Example update body:
+
+```json
+{
+  "name": "Sprout"
+}
+```
+
+Protected endpoints use:
 
 ```http
 Authorization: Bearer <token>
@@ -258,32 +201,183 @@ Authorization: Bearer <token>
 
 ---
 
-## Security Notes
+## Phase Summary
 
-The current authentication system is intentionally simple and educational.
+### Phase 1: Authentication Foundation - Complete
 
-Implemented so far:
+Implemented:
 
-- Passwords are hashed before being stored
-- Raw passwords are not returned from the API
-- Auth responses use DTOs
-- Protected endpoints require a bearer token
-- Logout marks tokens inactive
+- User account creation
+- Login
+- Logout
+- Password hashing
+- Auth token generation
+- Auth token validation
+- Protected current-user endpoint
+- Repository/service/controller structure
+- Initial EF Core migration
 
-Future security improvements may include:
+### Phase 2: Relationship/Pond Foundation - Complete
 
-- ASP.NET Core Identity
-- Built-in ASP.NET Core authentication/authorization middleware
-- JWT bearer authentication
-- Refresh tokens
-- Stronger validation
-- Authorization policies
-- More production-ready token/session management
+Implemented:
+
+- `Relationship` model
+- `RelationshipMember` model
+- Relationship creation
+- Membership creation
+- One active Pond guard for early v1 development
+- Membership lookup
+- Privacy helper logic to check whether a user belongs to a Relationship
+- `POST /api/relationship/create`
+- `GET /api/relationship/mine`
+- EF migration for Relationship/Pond foundation
+
+### Phase 3: Frog Foundation - Complete
+
+Implemented:
+
+- `Frog` model
+- `FrogMood` enum
+- `FrogActivityState` enum
+- One Frog per `RelationshipMember`
+- `DbSet<Frog>`
+- Fluent API one-to-one relationship mapping
+- Unique database constraint on `Frog.RelationshipMemberId`
+- EF migration and database update
+- Frog creation when a `RelationshipMember` is created
+- Frog repository
+- Frog service
+- Frog response DTO
+- Frog update request DTO
+- `GET /api/frog/mine`
+- `PUT /api/frog/mine`
+- Postman tests for Frog retrieval and update flows
+
+Frog privacy path:
+
+```text
+Bearer token -> UserAccount -> RelationshipMember -> Frog
+```
+
+The Frog endpoints do not accept arbitrary Frog IDs. They operate on the
+authenticated user's own Frog through their RelationshipMember record.
+
+### Phase 4: Daily Check-In - Next
+
+Planned:
+
+- `DailyCheckIn` model
+- Emotion enum
+- Primary, secondary, and tertiary emotions
+- Optional message
+- One check-in per user per Relationship per day
+- Check-in creation endpoint
+- Today's check-in status endpoint
+- Update Frog mood/activity state after check-in
 
 ---
 
-## Long-Term Vision
+## Postman
 
-The long-term vision for PondLite is to become a small, personal app that can help two partners stay connected through gentle emotional awareness, small acts of care, and shared reflection.
+The Postman collection is included at:
 
-The app is designed to avoid guilt-based or punitive mechanics. Instead, it focuses on small moments of connection, emotional visibility, and playful relationship growth.
+```text
+Postman/PondLite_Collection.postman_collection.json
+```
+
+Recommended high-level test order:
+
+1. Register account
+2. Log in
+3. Get current user
+4. Create Pond
+5. Get my Pond
+6. Get my Frog
+7. Update my Frog
+
+The collection uses variables such as:
+
+- `baseUrl`
+- `testUsername`
+- `testEmail`
+- `testPassword`
+- `token`
+- `relationshipId`
+- `frogId`
+- `frogName`
+
+---
+
+## Local Development
+
+Connection strings are managed through User Secrets and should not be committed
+to GitHub.
+
+The local database is expected to be named:
+
+```text
+pondlite_db
+```
+
+Common EF Core commands:
+
+```powershell
+dotnet ef migrations add <MigrationName>
+dotnet ef database update
+```
+
+Common build command:
+
+```powershell
+dotnet build
+```
+
+---
+
+## Security Notes
+
+The current authentication system is intentionally simple for early development
+and learning.
+
+Implemented so far:
+
+- Passwords are hashed before storage
+- Raw passwords are not returned from the API
+- Auth responses use DTOs
+- Protected endpoints require bearer tokens
+- Logout marks tokens inactive
+- Relationship/Pond access is checked through RelationshipMember records
+
+Future production work may include:
+
+- ASP.NET Core Identity or another production-ready auth approach
+- JWT bearer authentication or stronger session management
+- Password reset
+- Email verification
+- Rate limiting
+- Account deletion
+- Data deletion
+- Privacy policy and terms
+- Stronger logging, monitoring, and backup practices
+
+---
+
+## Product Tone
+
+PondLite should feel gentle, private, playful, and low-pressure.
+
+Preferred language:
+
+- Pond
+- PondMate
+- Frog
+- Ribbit
+- check-in
+- care
+- connection
+- shared rhythm
+- optional
+- gentle reminder
+
+Avoid punitive or guilt-based mechanics such as streak loss, shame language, or
+anything that makes care feel like a chore.
