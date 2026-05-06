@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using PondLite.Api.Data;
 using PondLite.Api.Repositories;
 using PondLite.Api.Services;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,7 +20,12 @@ builder.Services.AddScoped<IRelationshipRepository, EfRelationshipRepository>();
 builder.Services.AddScoped<IRelationshipMemberRepository, EfRelationshipMemberRepository>();
 builder.Services.AddScoped<IFrogRepository, EfFrogRepository>();
 builder.Services.AddScoped<IDailyCheckInRepository, EfDailyCheckInRepository>();
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(
+            new JsonStringEnumConverter());
+    });
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
