@@ -36,6 +36,20 @@ namespace PondLite.Api.Services
             return Task.FromResult(BuildFrogResponse(frog));
         }
 
+        public async Task<FrogResponse?> CreateMyFrogAsync(Guid userAccountId)
+        {
+            RelationshipMember? relationshipMember =
+                _relationshipMemberRepository.GetByUserAccountId(userAccountId);
+
+            if (relationshipMember == null)
+            {
+                return null;
+            }
+
+            return await CreateDefaultFrogForRelationshipMemberAsync(
+                relationshipMember.RelationshipMemberId);
+        }
+
         public Task<FrogResponse?> GetMyFrogAsync(Guid userAccountId)
         {
             RelationshipMember? relationshipMember =

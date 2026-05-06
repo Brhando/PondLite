@@ -175,9 +175,13 @@ GET  /api/relationship/mine
 ### Frog
 
 ```http
+POST /api/frog/mine
 GET /api/frog/mine
 PUT /api/frog/mine
 ```
+
+`POST /api/frog/mine` creates or returns the authenticated PondMate's default
+Frog.
 
 `GET /api/frog/mine` returns the authenticated PondMate's Frog.
 

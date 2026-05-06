@@ -911,6 +911,157 @@
       "name": "FrogTests",
       "item": [
         {
+          "name": "Create My Frog Success",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response contains default Frog data\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "\r",
+                  "    pm.expect(json.frogId).to.exist;\r",
+                  "    pm.expect(json.relationshipMemberId).to.exist;\r",
+                  "    pm.expect(json.name).to.exist;\r",
+                  "    pm.expect(json.currentMood).to.eql(\"None\");\r",
+                  "    pm.expect(json.activityState).to.eql(\"Asleep\");\r",
+                  "    pm.expect(json.lastUpdatedAt).to.exist;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Save Frog response values\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "\r",
+                  "    pm.collectionVariables.set(\"frogId\", json.frogId);\r",
+                  "    pm.collectionVariables.set(\"frogRelationshipMemberId\", json.relationshipMemberId);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/frog/mine",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "frog",
+                "mine"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create My Frog Missing Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 401 Unauthorized\", function () {\r",
+                  "    pm.response.to.have.status(401);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response says invalid or expired token\", function () {\r",
+                  "    pm.expect(pm.response.text()).to.include(\"Invalid or expired token\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/frog/mine",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "frog",
+                "mine"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create My Frog Invalid Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 401 Unauthorized\", function () {\r",
+                  "    pm.response.to.have.status(401);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response says invalid or expired token\", function () {\r",
+                  "    pm.expect(pm.response.text()).to.include(\"Invalid or expired token\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "fake-token",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/frog/mine",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "frog",
+                "mine"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
           "name": "Get My Frog Success",
           "event": [
             {
