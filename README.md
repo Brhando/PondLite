@@ -24,10 +24,11 @@ Completed:
 - Phase 2: Relationship/Pond Foundation
 - Phase 3: Frog Foundation
 - Phase 4: Daily Check-In
+- Phase 5: Ribbits / Gentle Reminders
 
 Next planned phase:
 
-- Phase 5: Ribbits / Gentle Reminders
+- Phase 6: Discussion Prompts
 
 There is no frontend yet.
 
@@ -168,6 +169,46 @@ Relationship/Pond.
 Daily check-ins are unique by `RelationshipId`, `UserAccountId`, and
 `CheckInDate`, so a PondMate can only create one check-in per Pond per day.
 
+### Ribbit
+
+Represents a gentle message, care offer, little nudge, or lightweight request
+sent from one PondMate to another inside the same Relationship/Pond.
+
+- `RibbitId`
+- `RelationshipId`
+- `SenderUserId`
+- `ReceiverUserId`
+- `Type`
+- `Status`
+- `Message`
+- `AcknowledgementEmoji`
+- `DeliveryTime`
+- `CreatedAt`
+- `AcknowledgedAt`
+- `CompletedAt`
+- `DeclinedAt`
+- `CancelledAt`
+- `Relationship`
+- `SenderUser`
+- `ReceiverUser`
+
+Current Ribbit types:
+
+- `Thought`
+- `CareOffer`
+- `GentleRequest`
+- `LittleNudge`
+
+Current Ribbit statuses:
+
+- `Sent`
+- `Acknowledged`
+- `Completed`
+- `Declined`
+- `Cancelled`
+
+`Completed`, `Declined`, and `Cancelled` are final states.
+
 ---
 
 ## Implemented Endpoints
@@ -191,8 +232,26 @@ GET  /api/auth/me
 
 ```http
 POST /api/relationship/create
+POST /api/relationship/join
 GET  /api/relationship/mine
 ```
+
+`POST /api/relationship/create` creates a new Pond and makes the authenticated
+user the owner.
+
+`POST /api/relationship/join` adds the authenticated user to an existing Pond if
+they do not already belong to one and the Pond is not full.
+
+Example join body:
+
+```json
+{
+  "relationshipId": "00000000-0000-0000-0000-000000000000",
+  "displayName": "PondMate"
+}
+```
+
+`GET /api/relationship/mine` returns the authenticated user's active Pond.
 
 ### Frog
 
@@ -252,6 +311,65 @@ Creating a daily check-in also updates the authenticated PondMate's Frog:
 - `CurrentMood` is mapped from the primary emotion.
 - `ActivityState` becomes `Active`.
 
+### Ribbits
+
+```http
+POST  /api/ribbit
+GET   /api/ribbit/active
+GET   /api/ribbit/sent
+PATCH /api/ribbit/{ribbitId}/acknowledge
+PATCH /api/ribbit/{ribbitId}/complete
+PATCH /api/ribbit/{ribbitId}/decline
+PATCH /api/ribbit/{ribbitId}/cancel
+```
+
+`POST /api/ribbit` creates a Ribbit from the authenticated PondMate to another
+PondMate in the same Relationship/Pond.
+
+Example create body:
+
+```json
+{
+  "receiverUserId": "00000000-0000-0000-0000-000000000000",
+  "type": "GentleRequest",
+  "message": "Could you send me a small check-in when you have a quiet moment?",
+  "deliveryTime": null
+}
+```
+
+`GET /api/ribbit/active` returns active Ribbits for the authenticated receiver.
+Completed, declined, and cancelled Ribbits are excluded.
+
+`GET /api/ribbit/sent` returns Ribbits sent by the authenticated sender.
+
+`PATCH /api/ribbit/{ribbitId}/acknowledge` lets only the receiver acknowledge a
+Ribbit.
+
+Example acknowledge body:
+
+```json
+{
+  "acknowledgementEmoji": "heart"
+}
+```
+
+`PATCH /api/ribbit/{ribbitId}/complete` lets only the receiver complete a
+Ribbit.
+
+`PATCH /api/ribbit/{ribbitId}/decline` lets only the receiver decline a Ribbit.
+
+`PATCH /api/ribbit/{ribbitId}/cancel` lets only the sender cancel a Ribbit.
+
+Ribbit rules currently enforced by the backend:
+
+- Auth is required for all Ribbit endpoints.
+- Sender and receiver must both belong to the same Relationship/Pond.
+- Sender cannot send a Ribbit to themselves.
+- Only the receiver can acknowledge, complete, or decline a Ribbit.
+- Only the sender can cancel a Ribbit.
+- Completed, declined, and cancelled Ribbits are final states.
+- Active Ribbits exclude completed, declined, and cancelled Ribbits.
+
 Protected endpoints use:
 
 ```http
@@ -288,6 +406,7 @@ Implemented:
 - Membership lookup
 - Privacy helper logic to check whether a user belongs to a Relationship
 - `POST /api/relationship/create`
+- `POST /api/relationship/join`
 - `GET /api/relationship/mine`
 - EF migration for Relationship/Pond foundation
 
@@ -349,9 +468,9 @@ Bearer token -> UserAccount -> RelationshipMember -> Relationship -> DailyCheckI
 Check-in endpoints require the authenticated user to be a member of the
 requested Relationship/Pond.
 
-### Phase 5: Ribbits / Gentle Reminders - Next
+### Phase 5: Ribbits / Gentle Reminders - Complete
 
-Planned:
+Implemented:
 
 - `Ribbit` model
 - Ribbit type enum
@@ -359,9 +478,38 @@ Planned:
 - Sender and receiver membership validation
 - Create/send Ribbit endpoint
 - Retrieve active Ribbits for a PondMate
+- Retrieve sent Ribbits for a PondMate
 - Acknowledge Ribbit endpoint
 - Complete, decline, or cancel Ribbit behavior where applicable
-- Frog notification indicator for unacknowledged Ribbits
+- Sender-only cancel rule
+- Receiver-only acknowledge, complete, and decline rules
+- Self-send prevention
+- Receiver-outside-Pond prevention
+- Final-state protection for completed, declined, and cancelled Ribbits
+- Active Ribbits exclude completed, declined, and cancelled Ribbits
+- EF migration and indexes for Ribbit lookup
+- Postman tests for Ribbit happy paths, authorization failures, membership rules, wrong-user state changes, final-state protection, active Ribbits, and sent Ribbits
+
+Ribbit privacy path:
+
+```text
+Bearer token -> UserAccount -> RelationshipMember -> Relationship -> Ribbit
+```
+
+Ribbits are only valid when sender and receiver are both PondMates in the same
+Relationship/Pond.
+
+### Phase 6: Discussion Prompts - Next
+
+Planned:
+
+- `DiscussionPrompt` model
+- `DiscussionResponse` model
+- Daily prompt retrieval
+- Submit discussion response endpoint
+- Retrieve responses for the current prompt
+- Track prompt response status for PondMates
+- Unique response rule per prompt and user
 
 ---
 
@@ -387,6 +535,10 @@ Recommended high-level test order:
 10. Get my today check-in
 11. Get Pond check-in status
 12. Confirm Frog state updated after check-in
+13. Join a second PondMate to the Pond
+14. Create Ribbits between PondMates
+15. Acknowledge, complete, decline, and cancel Ribbits
+16. Confirm Ribbit access and final-state rules
 
 The collection uses variables such as:
 
@@ -399,6 +551,13 @@ The collection uses variables such as:
 - `frogId`
 - `frogName`
 - `dailyCheckInId`
+- `ribbitSenderToken`
+- `ribbitReceiverToken`
+- `ribbitOutsiderToken`
+- `ribbitSenderUserAccountId`
+- `ribbitReceiverUserAccountId`
+- `ribbitOutsiderUserAccountId`
+- `ribbitId`
 
 ---
 
