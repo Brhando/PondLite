@@ -22,6 +22,8 @@ namespace PondLite.Api.Data
 
         public DbSet<DailyCheckIn> DailyCheckIns { get; set; }
 
+        public DbSet<Ribbit> Ribbits { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -107,6 +109,49 @@ namespace PondLite.Api.Data
             modelBuilder.Entity<DailyCheckIn>()
                 .Property(checkIn => checkIn.TertiaryEmotion)
                 .HasConversion<string>();
+
+            // - - -Ribbit- - -
+            modelBuilder.Entity<Ribbit>()
+                .HasOne(ribbit => ribbit.Relationship)
+                .WithMany()
+                .HasForeignKey(ribbit => ribbit.RelationshipId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Ribbit>()
+                .HasOne(ribbit => ribbit.SenderUser)
+                .WithMany()
+                .HasForeignKey(ribbit => ribbit.SenderUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Ribbit>()
+                .HasOne(ribbit => ribbit.ReceiverUser)
+                .WithMany()
+                .HasForeignKey(ribbit => ribbit.ReceiverUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Ribbit>()
+                .Property(ribbit => ribbit.Type)
+                .HasConversion<string>();
+
+            modelBuilder.Entity<Ribbit>()
+                .Property(ribbit => ribbit.Status)
+                .HasConversion<string>();
+
+            modelBuilder.Entity<Ribbit>()
+                .HasIndex(ribbit => new
+                {
+                    ribbit.RelationshipId,
+                    ribbit.ReceiverUserId,
+                    ribbit.Status
+                });
+
+            modelBuilder.Entity<Ribbit>()
+                .HasIndex(ribbit => new
+                {
+                    ribbit.RelationshipId,
+                    ribbit.SenderUserId,
+                    ribbit.Status
+                });
         }
     }
 }
