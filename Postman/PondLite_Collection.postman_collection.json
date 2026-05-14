@@ -1,6 +1,6 @@
 {
   "info": {
-    "_postman_id": "484716b6-e1d5-48d6-ba27-4dde1ce5a167",
+    "_postman_id": "af4493a5-d384-4efc-8e03-751c52d68928",
     "name": "PondLite_Collection",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "51711467"
@@ -112,6 +112,34 @@
             "body": {
               "mode": "raw",
               "raw": "{\r\n  \"username\": \"{{secondTestUsername}}\",\r\n  \"email\": \"{{secondTestEmail}}\",\r\n  \"password\": \"{{secondTestPassword}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "register"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Register Account Success 3",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"username\": \"outsider\",\r\n  \"email\": \"outsider@example.com\",\r\n  \"password\": \"outsider123\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -900,6 +928,44 @@
                 "api",
                 "relationship",
                 "mine"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Join Pond Success",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ribbitReceiverToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"relationshipId\": \"{{relationshipId}}\",\r\n    \"displayName\": \"{{secondTestUsername}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/relationship/join",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "relationship",
+                "join"
               ]
             }
           },
@@ -1975,7 +2041,6 @@
     },
     {
       "name": "Ribbit Tests",
-      "description": "Setup needed before running: ribbit sender and receiver must both have UserAccount rows and RelationshipMember rows in the same Relationship/Pond. The outsider account should be a valid UserAccount outside that Relationship/Pond, or not connected to a Pond. Populate ribbitReceiverUsername/ribbitReceiverPassword and ribbitOutsiderUsername/ribbitOutsiderPassword before running.",
       "item": [
         {
           "name": "Ribbit Setup - Login Sender",
@@ -2043,9 +2108,6 @@
             {
               "listen": "test",
               "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "requests": {},
                 "exec": [
                   "pm.test(\"Status code is 200 OK\", function () {\r",
                   "    pm.response.to.have.status(200);\r",
@@ -2065,7 +2127,10 @@
                   "    pm.collectionVariables.set(\"ribbitReceiverUserAccountId\", json.userAccountId);\r",
                   "    if (pm.environment.name) { pm.environment.set(\"ribbitReceiverUserAccountId\", json.userAccountId); }\r",
                   "});"
-                ]
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
               }
             }
           ],
@@ -2074,7 +2139,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n  \"usernameOrEmail\": \"{{ribbitReceiverUsername}}\",\r\n  \"password\": \"{{ribbitReceiverPassword}}\"\r\n}",
+              "raw": "{\r\n  \"usernameOrEmail\": \"{{secondTestUsername}}\",\r\n  \"password\": \"{{secondTestPassword}}\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -2101,9 +2166,6 @@
             {
               "listen": "test",
               "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "requests": {},
                 "exec": [
                   "pm.test(\"Status code is 200 OK\", function () {\r",
                   "    pm.response.to.have.status(200);\r",
@@ -2123,7 +2185,10 @@
                   "    pm.collectionVariables.set(\"ribbitOutsiderUserAccountId\", json.userAccountId);\r",
                   "    if (pm.environment.name) { pm.environment.set(\"ribbitOutsiderUserAccountId\", json.userAccountId); }\r",
                   "});"
-                ]
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
               }
             }
           ],
@@ -2132,7 +2197,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n  \"usernameOrEmail\": \"{{ribbitOutsiderUsername}}\",\r\n  \"password\": \"{{ribbitOutsiderPassword}}\"\r\n}",
+              "raw": "{\r\n  \"usernameOrEmail\": \"outsider\",\r\n  \"password\": \"outsider123\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -2159,9 +2224,6 @@
             {
               "listen": "test",
               "script": {
-                "type": "text/javascript",
-                "packages": {},
-                "requests": {},
                 "exec": [
                   "pm.test(\"Status code is 200 OK\", function () {\r",
                   "    pm.response.to.have.status(200);\r",
@@ -2177,7 +2239,10 @@
                   "    pm.collectionVariables.set(\"relationshipId\", json.relationshipId);\r",
                   "    if (pm.environment.name) { pm.environment.set(\"relationshipId\", json.relationshipId); }\r",
                   "});"
-                ]
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
               }
             }
           ],
@@ -4219,7 +4284,8 @@
           },
           "response": []
         }
-      ]
+      ],
+      "description": "Setup needed before running: ribbit sender and receiver must both have UserAccount rows and RelationshipMember rows in the same Relationship/Pond. The outsider account should be a valid UserAccount outside that Relationship/Pond, or not connected to a Pond. Populate ribbitReceiverUsername/ribbitReceiverPassword and ribbitOutsiderUsername/ribbitOutsiderPassword before running."
     }
   ],
   "event": [
