@@ -13,6 +13,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IRelationshipService, RelationshipService>();
 builder.Services.AddScoped<IFrogService, FrogService>();
 builder.Services.AddScoped<IDailyCheckInService, DailyCheckInService>();
+builder.Services.AddScoped<IRibbitService, RibbitService>();
 
 builder.Services.AddScoped<IUserAccountRepository, EfUserAccountRepository>();
 builder.Services.AddScoped<IAuthTokenRepository, EfAuthTokenRepository>();
@@ -20,6 +21,7 @@ builder.Services.AddScoped<IRelationshipRepository, EfRelationshipRepository>();
 builder.Services.AddScoped<IRelationshipMemberRepository, EfRelationshipMemberRepository>();
 builder.Services.AddScoped<IFrogRepository, EfFrogRepository>();
 builder.Services.AddScoped<IDailyCheckInRepository, EfDailyCheckInRepository>();
+builder.Services.AddScoped<IRibbitRepository, EfRibbitRepository>();
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {

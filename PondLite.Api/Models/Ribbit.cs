@@ -41,5 +41,7 @@ namespace PondLite.Api.Models
         public DateTime? CompletedAt { get; set; }
 
         public DateTime? DeclinedAt { get; set; }
+
+        public DateTime? CancelledAt { get; set; }
     }
 }
