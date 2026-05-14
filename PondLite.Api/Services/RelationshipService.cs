@@ -95,6 +95,67 @@ namespace PondLite.Api.Services
             return Task.FromResult<RelationshipResponse?>(response);
         }
 
+        public async Task<RelationshipResponse?> JoinRelationshipAsync(
+    Guid userAccountId,
+    JoinRelationshipRequest request)
+        {
+            RelationshipMember? existingMembership =
+                _relationshipMemberRepository.GetByUserAccountId(userAccountId);
+
+            if (existingMembership != null)
+            {
+                return null;
+            }
+
+            Relationship? relationship =
+                _relationshipRepository.GetById(request.RelationshipId);
+
+            if (relationship == null)
+            {
+                return null;
+            }
+
+            int memberCount =
+                _relationshipMemberRepository.CountMembersForRelationship(
+                    request.RelationshipId);
+
+            if (memberCount >= 2)
+            {
+                return null;
+            }
+
+            RelationshipMember relationshipMember = new RelationshipMember
+            {
+                RelationshipId = relationship.RelationshipId,
+                UserAccountId = userAccountId,
+                DisplayName = string.IsNullOrWhiteSpace(request.DisplayName)
+                    ? "PondMate"
+                    : request.DisplayName.Trim(),
+                Role = "Member",
+                JoinedAt = DateTime.UtcNow
+            };
+
+            _relationshipMemberRepository.Add(relationshipMember);
+
+            await _frogService.CreateDefaultFrogForRelationshipMemberAsync(
+                relationshipMember.RelationshipMemberId);
+
+            relationship.UpdatedAt = DateTime.UtcNow;
+            _relationshipRepository.Update(relationship);
+
+            RelationshipResponse response = new RelationshipResponse
+            {
+                RelationshipId = relationship.RelationshipId,
+                Name = relationship.Name,
+                RelationshipMemberId = relationshipMember.RelationshipMemberId,
+                DisplayName = relationshipMember.DisplayName,
+                Role = relationshipMember.Role,
+                JoinedAt = relationshipMember.JoinedAt
+            };
+
+            return response;
+        }
+
         public Task<bool> UserBelongsToRelationshipAsync(
             Guid userAccountId,
             Guid relationshipId)

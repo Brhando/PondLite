@@ -14,5 +14,9 @@ namespace PondLite.Api.Services
         Task<bool> UserBelongsToRelationshipAsync(
             Guid userAccountId,
             Guid relationshipId);
+
+        Task<RelationshipResponse?> JoinRelationshipAsync(
+            Guid userAccountId,
+            JoinRelationshipRequest request);
     }
 }

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PondLite.Api.Data;
@@ -11,9 +12,11 @@ using PondLite.Api.Data;
 namespace PondLite.Api.Migrations
 {
     [DbContext(typeof(PondLiteDbContext))]
-    partial class PondLiteDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260514192146_AddCancelledAtToRibbits")]
+    partial class AddCancelledAtToRibbits
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

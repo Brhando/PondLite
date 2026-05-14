@@ -14,6 +14,8 @@ namespace PondLite.Api.Repositories
 
         bool RelationshipHasMember(Guid relationshipId, Guid userAccountId);
 
+        int CountMembersForRelationship(Guid relationshipId);
+
         List<RelationshipMember> GetByRelationshipId(Guid relationshipId);
     }
 }

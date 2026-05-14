@@ -66,6 +66,30 @@ namespace PondLite.Api.Controllers
             return Ok(response);
         }
 
+        [HttpPost("join")]
+        public async Task<IActionResult> JoinRelationship(
+        [FromBody] JoinRelationshipRequest request)
+        {
+            UserAccount? user = GetUserFromBearerToken();
+
+            if (user == null)
+            {
+                return Unauthorized("Invalid or expired token.");
+            }
+
+            RelationshipResponse? response =
+                await _relationshipService.JoinRelationshipAsync(
+                    user.AccountId,
+                    request);
+
+            if (response == null)
+            {
+                return BadRequest("Unable to join Pond. The Pond may not exist, may already be full, or you may already belong to a Pond.");
+            }
+
+            return Ok(response);
+        }
+
         private UserAccount? GetUserFromBearerToken()
         {
             string authHeader = Request.Headers.Authorization.ToString();

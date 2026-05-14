@@ -1972,6 +1972,2254 @@
           "response": []
         }
       ]
+    },
+    {
+      "name": "Ribbit Tests",
+      "description": "Setup needed before running: ribbit sender and receiver must both have UserAccount rows and RelationshipMember rows in the same Relationship/Pond. The outsider account should be a valid UserAccount outside that Relationship/Pond, or not connected to a Pond. Populate ribbitReceiverUsername/ribbitReceiverPassword and ribbitOutsiderUsername/ribbitOutsiderPassword before running.",
+      "item": [
+        {
+          "name": "Ribbit Setup - Login Sender",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response includes auth data\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "\r",
+                  "    pm.expect(json.userAccountId).to.exist;\r",
+                  "    pm.expect(json.token).to.exist;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Store Ribbit auth values\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.collectionVariables.set(\"ribbitSenderToken\", json.token);\r",
+                  "    if (pm.environment.name) { pm.environment.set(\"ribbitSenderToken\", json.token); }\r",
+                  "    pm.collectionVariables.set(\"ribbitSenderUserAccountId\", json.userAccountId);\r",
+                  "    if (pm.environment.name) { pm.environment.set(\"ribbitSenderUserAccountId\", json.userAccountId); }\r",
+                  "    pm.collectionVariables.set(\"token\", json.token);\r",
+                  "    if (pm.environment.name) { pm.environment.set(\"token\", json.token); }\r",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"usernameOrEmail\": \"{{ribbitSenderUsername}}\",\r\n  \"password\": \"{{ribbitSenderPassword}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Ribbit Setup - Login Receiver",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response includes auth data\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "\r",
+                  "    pm.expect(json.userAccountId).to.exist;\r",
+                  "    pm.expect(json.token).to.exist;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Store Ribbit auth values\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.collectionVariables.set(\"ribbitReceiverToken\", json.token);\r",
+                  "    if (pm.environment.name) { pm.environment.set(\"ribbitReceiverToken\", json.token); }\r",
+                  "    pm.collectionVariables.set(\"ribbitReceiverUserAccountId\", json.userAccountId);\r",
+                  "    if (pm.environment.name) { pm.environment.set(\"ribbitReceiverUserAccountId\", json.userAccountId); }\r",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"usernameOrEmail\": \"{{ribbitReceiverUsername}}\",\r\n  \"password\": \"{{ribbitReceiverPassword}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Ribbit Setup - Login Outsider",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response includes auth data\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "\r",
+                  "    pm.expect(json.userAccountId).to.exist;\r",
+                  "    pm.expect(json.token).to.exist;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Store Ribbit auth values\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.collectionVariables.set(\"ribbitOutsiderToken\", json.token);\r",
+                  "    if (pm.environment.name) { pm.environment.set(\"ribbitOutsiderToken\", json.token); }\r",
+                  "    pm.collectionVariables.set(\"ribbitOutsiderUserAccountId\", json.userAccountId);\r",
+                  "    if (pm.environment.name) { pm.environment.set(\"ribbitOutsiderUserAccountId\", json.userAccountId); }\r",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"usernameOrEmail\": \"{{ribbitOutsiderUsername}}\",\r\n  \"password\": \"{{ribbitOutsiderPassword}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Ribbit Setup - Get Sender Pond",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Sender has active Pond\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.expect(json.relationshipId).to.exist;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Store relationshipId\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.collectionVariables.set(\"relationshipId\", json.relationshipId);\r",
+                  "    if (pm.environment.name) { pm.environment.set(\"relationshipId\", json.relationshipId); }\r",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ribbitSenderToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/relationship/mine",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "relationship",
+                "mine"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Ribbit Setup - Confirm Receiver Same Pond",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Receiver belongs to sender Pond\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.expect(json.relationshipId).to.eql(pm.collectionVariables.get(\"relationshipId\"));\r",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ribbitReceiverToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/relationship/mine",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "relationship",
+                "mine"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Ribbit Success",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response contains created Ribbit\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "\r",
+                  "    pm.expect(json.ribbitId).to.exist;\r",
+                  "    pm.expect(json.relationshipId).to.eql(pm.collectionVariables.get(\"relationshipId\"));\r",
+                  "    pm.expect(json.senderUserId).to.eql(pm.collectionVariables.get(\"ribbitSenderUserAccountId\"));\r",
+                  "    pm.expect(json.receiverUserId).to.eql(pm.collectionVariables.get(\"ribbitReceiverUserAccountId\"));\r",
+                  "    pm.expect(json.type).to.eql(pm.collectionVariables.get(\"ribbitType\"));\r",
+                  "    pm.expect(json.status).to.eql(\"Sent\");\r",
+                  "    pm.expect(json.message).to.eql(pm.collectionVariables.get(\"ribbitMessage\"));\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Store Ribbit ID\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.collectionVariables.set(\"ribbitId\", json.ribbitId);\r",
+                  "    if (pm.environment.name) { pm.environment.set(\"ribbitId\", json.ribbitId); }\r",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ribbitSenderToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"receiverUserId\": \"{{ribbitReceiverUserAccountId}}\",\n  \"type\": \"{{ribbitType}}\",\n  \"message\": \"{{ribbitMessage}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/ribbit",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "ribbit"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Ribbit Missing Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "exec": [
+                  "pm.test(\"Status code is 401 Unauthorized\", function () {\r",
+                  "    pm.response.to.have.status(401);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response says invalid or expired token\", function () {\r",
+                  "    pm.expect(pm.response.text()).to.include(\"Invalid or expired token\");\r",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"receiverUserId\": \"{{ribbitReceiverUserAccountId}}\",\n  \"type\": \"{{ribbitType}}\",\n  \"message\": \"{{ribbitMessage}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/ribbit",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "ribbit"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Ribbit Invalid Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "exec": [
+                  "pm.test(\"Status code is 401 Unauthorized\", function () {\r",
+                  "    pm.response.to.have.status(401);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response says invalid or expired token\", function () {\r",
+                  "    pm.expect(pm.response.text()).to.include(\"Invalid or expired token\");\r",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "fake-token",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"receiverUserId\": \"{{ribbitReceiverUserAccountId}}\",\n  \"type\": \"{{ribbitType}}\",\n  \"message\": \"{{ribbitMessage}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/ribbit",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "ribbit"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Active Ribbits Invalid Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "exec": [
+                  "pm.test(\"Status code is 401 Unauthorized\", function () {\r",
+                  "    pm.response.to.have.status(401);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response says invalid or expired token\", function () {\r",
+                  "    pm.expect(pm.response.text()).to.include(\"Invalid or expired token\");\r",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "fake-token",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/ribbit/active",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "ribbit",
+                "active"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Sent Ribbits Missing Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "exec": [
+                  "pm.test(\"Status code is 401 Unauthorized\", function () {\r",
+                  "    pm.response.to.have.status(401);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response says invalid or expired token\", function () {\r",
+                  "    pm.expect(pm.response.text()).to.include(\"Invalid or expired token\");\r",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/ribbit/sent",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "ribbit",
+                "sent"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Ribbit Empty Message",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "exec": [
+                  "pm.test(\"Status code is 400 Bad Request\", function () {\r",
+                  "    pm.response.to.have.status(400);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response says unable to create Ribbit\", function () {\r",
+                  "    pm.expect(pm.response.text()).to.include(\"Unable to create Ribbit\");\r",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ribbitSenderToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"receiverUserId\": \"{{ribbitReceiverUserAccountId}}\",\n  \"type\": \"{{ribbitType}}\",\n  \"message\": \"{{ribbitEmptyMessage}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/ribbit",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "ribbit"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Ribbit Self Send Blocked",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "exec": [
+                  "pm.test(\"Status code is 400 Bad Request\", function () {\r",
+                  "    pm.response.to.have.status(400);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response says unable to create Ribbit\", function () {\r",
+                  "    pm.expect(pm.response.text()).to.include(\"Unable to create Ribbit\");\r",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ribbitSenderToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"receiverUserId\": \"{{ribbitSenderUserAccountId}}\",\n  \"type\": \"{{ribbitType}}\",\n  \"message\": \"{{ribbitMessage}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/ribbit",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "ribbit"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Ribbit Receiver Outside Pond Blocked",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "exec": [
+                  "pm.test(\"Status code is 400 Bad Request\", function () {\r",
+                  "    pm.response.to.have.status(400);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response says receiver must belong to Pond\", function () {\r",
+                  "    pm.expect(pm.response.text()).to.include(\"receiver belongs to your Pond\");\r",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ribbitSenderToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"receiverUserId\": \"{{ribbitOutsiderUserAccountId}}\",\n  \"type\": \"{{ribbitType}}\",\n  \"message\": \"{{ribbitMessage}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/ribbit",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "ribbit"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Acknowledge Ribbit Missing Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "exec": [
+                  "pm.test(\"Status code is 401 Unauthorized\", function () {\r",
+                  "    pm.response.to.have.status(401);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response says invalid or expired token\", function () {\r",
+                  "    pm.expect(pm.response.text()).to.include(\"Invalid or expired token\");\r",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"acknowledgementEmoji\": \"{{ribbitAcknowledgementEmoji}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/ribbit/{{ribbitId}}/acknowledge",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "ribbit",
+                "{{ribbitId}}",
+                "acknowledge"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Acknowledge Ribbit Invalid Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "exec": [
+                  "pm.test(\"Status code is 401 Unauthorized\", function () {\r",
+                  "    pm.response.to.have.status(401);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response says invalid or expired token\", function () {\r",
+                  "    pm.expect(pm.response.text()).to.include(\"Invalid or expired token\");\r",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "fake-token",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"acknowledgementEmoji\": \"{{ribbitAcknowledgementEmoji}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/ribbit/{{ribbitId}}/acknowledge",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "ribbit",
+                "{{ribbitId}}",
+                "acknowledge"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Complete Ribbit Missing Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "exec": [
+                  "pm.test(\"Status code is 401 Unauthorized\", function () {\r",
+                  "    pm.response.to.have.status(401);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response says invalid or expired token\", function () {\r",
+                  "    pm.expect(pm.response.text()).to.include(\"Invalid or expired token\");\r",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/ribbit/{{ribbitId}}/complete",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "ribbit",
+                "{{ribbitId}}",
+                "complete"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Complete Ribbit Invalid Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "exec": [
+                  "pm.test(\"Status code is 401 Unauthorized\", function () {\r",
+                  "    pm.response.to.have.status(401);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response says invalid or expired token\", function () {\r",
+                  "    pm.expect(pm.response.text()).to.include(\"Invalid or expired token\");\r",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "fake-token",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/ribbit/{{ribbitId}}/complete",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "ribbit",
+                "{{ribbitId}}",
+                "complete"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Decline Ribbit Missing Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "exec": [
+                  "pm.test(\"Status code is 401 Unauthorized\", function () {\r",
+                  "    pm.response.to.have.status(401);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response says invalid or expired token\", function () {\r",
+                  "    pm.expect(pm.response.text()).to.include(\"Invalid or expired token\");\r",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/ribbit/{{ribbitId}}/decline",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "ribbit",
+                "{{ribbitId}}",
+                "decline"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Decline Ribbit Invalid Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "exec": [
+                  "pm.test(\"Status code is 401 Unauthorized\", function () {\r",
+                  "    pm.response.to.have.status(401);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response says invalid or expired token\", function () {\r",
+                  "    pm.expect(pm.response.text()).to.include(\"Invalid or expired token\");\r",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "fake-token",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/ribbit/{{ribbitId}}/decline",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "ribbit",
+                "{{ribbitId}}",
+                "decline"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cancel Ribbit Missing Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "exec": [
+                  "pm.test(\"Status code is 401 Unauthorized\", function () {\r",
+                  "    pm.response.to.have.status(401);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response says invalid or expired token\", function () {\r",
+                  "    pm.expect(pm.response.text()).to.include(\"Invalid or expired token\");\r",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/ribbit/{{ribbitId}}/cancel",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "ribbit",
+                "{{ribbitId}}",
+                "cancel"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cancel Ribbit Invalid Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "exec": [
+                  "pm.test(\"Status code is 401 Unauthorized\", function () {\r",
+                  "    pm.response.to.have.status(401);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response says invalid or expired token\", function () {\r",
+                  "    pm.expect(pm.response.text()).to.include(\"Invalid or expired token\");\r",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "fake-token",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/ribbit/{{ribbitId}}/cancel",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "ribbit",
+                "{{ribbitId}}",
+                "cancel"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Ribbit For Acknowledge",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response contains created Ribbit\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "\r",
+                  "    pm.expect(json.ribbitId).to.exist;\r",
+                  "    pm.expect(json.relationshipId).to.eql(pm.collectionVariables.get(\"relationshipId\"));\r",
+                  "    pm.expect(json.senderUserId).to.eql(pm.collectionVariables.get(\"ribbitSenderUserAccountId\"));\r",
+                  "    pm.expect(json.receiverUserId).to.eql(pm.collectionVariables.get(\"ribbitReceiverUserAccountId\"));\r",
+                  "    pm.expect(json.type).to.eql(pm.collectionVariables.get(\"ribbitType\"));\r",
+                  "    pm.expect(json.status).to.eql(\"Sent\");\r",
+                  "    pm.expect(json.message).to.eql(pm.collectionVariables.get(\"ribbitAcknowledgeMessage\"));\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Store Ribbit ID\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.collectionVariables.set(\"ribbitAcknowledgeId\", json.ribbitId);\r",
+                  "    if (pm.environment.name) { pm.environment.set(\"ribbitAcknowledgeId\", json.ribbitId); }\r",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ribbitSenderToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"receiverUserId\": \"{{ribbitReceiverUserAccountId}}\",\n  \"type\": \"{{ribbitType}}\",\n  \"message\": \"{{ribbitAcknowledgeMessage}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/ribbit",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "ribbit"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Acknowledge Ribbit Success",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Ribbit status is Acknowledged\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "\r",
+                  "    pm.expect(json.ribbitId).to.eql(pm.collectionVariables.get(\"ribbitAcknowledgeId\"));\r",
+                  "    pm.expect(json.status).to.eql(\"Acknowledged\");\r",
+                  "    pm.expect(json.acknowledgedAt).to.exist;\r",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ribbitReceiverToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"acknowledgementEmoji\": \"{{ribbitAcknowledgementEmoji}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/ribbit/{{ribbitAcknowledgeId}}/acknowledge",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "ribbit",
+                "{{ribbitAcknowledgeId}}",
+                "acknowledge"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Ribbit For Complete",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response contains created Ribbit\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "\r",
+                  "    pm.expect(json.ribbitId).to.exist;\r",
+                  "    pm.expect(json.relationshipId).to.eql(pm.collectionVariables.get(\"relationshipId\"));\r",
+                  "    pm.expect(json.senderUserId).to.eql(pm.collectionVariables.get(\"ribbitSenderUserAccountId\"));\r",
+                  "    pm.expect(json.receiverUserId).to.eql(pm.collectionVariables.get(\"ribbitReceiverUserAccountId\"));\r",
+                  "    pm.expect(json.type).to.eql(pm.collectionVariables.get(\"ribbitType\"));\r",
+                  "    pm.expect(json.status).to.eql(\"Sent\");\r",
+                  "    pm.expect(json.message).to.eql(pm.collectionVariables.get(\"ribbitCompleteMessage\"));\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Store Ribbit ID\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.collectionVariables.set(\"ribbitCompleteId\", json.ribbitId);\r",
+                  "    if (pm.environment.name) { pm.environment.set(\"ribbitCompleteId\", json.ribbitId); }\r",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ribbitSenderToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"receiverUserId\": \"{{ribbitReceiverUserAccountId}}\",\n  \"type\": \"{{ribbitType}}\",\n  \"message\": \"{{ribbitCompleteMessage}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/ribbit",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "ribbit"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Sender Cannot Complete Receiver Ribbit",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "exec": [
+                  "pm.test(\"Status code is 400 Bad Request\", function () {\r",
+                  "    pm.response.to.have.status(400);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response explains state change was blocked\", function () {\r",
+                  "    pm.expect(pm.response.text().toLowerCase()).to.include(\"unable\");\r",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ribbitSenderToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/ribbit/{{ribbitCompleteId}}/complete",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "ribbit",
+                "{{ribbitCompleteId}}",
+                "complete"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Complete Ribbit Success",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Ribbit status is Completed\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "\r",
+                  "    pm.expect(json.ribbitId).to.eql(pm.collectionVariables.get(\"ribbitCompleteId\"));\r",
+                  "    pm.expect(json.status).to.eql(\"Completed\");\r",
+                  "    pm.expect(json.completedAt).to.exist;\r",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ribbitReceiverToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/ribbit/{{ribbitCompleteId}}/complete",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "ribbit",
+                "{{ribbitCompleteId}}",
+                "complete"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Completed Ribbit Cannot Be Acknowledged Again",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "exec": [
+                  "pm.test(\"Status code is 400 Bad Request\", function () {\r",
+                  "    pm.response.to.have.status(400);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response explains state change was blocked\", function () {\r",
+                  "    pm.expect(pm.response.text().toLowerCase()).to.include(\"unable\");\r",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ribbitReceiverToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"acknowledgementEmoji\": \"{{ribbitAcknowledgementEmoji}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/ribbit/{{ribbitCompleteId}}/acknowledge",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "ribbit",
+                "{{ribbitCompleteId}}",
+                "acknowledge"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Completed Ribbit Cannot Be Cancelled",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "exec": [
+                  "pm.test(\"Status code is 400 Bad Request\", function () {\r",
+                  "    pm.response.to.have.status(400);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response explains state change was blocked\", function () {\r",
+                  "    pm.expect(pm.response.text().toLowerCase()).to.include(\"unable\");\r",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ribbitSenderToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/ribbit/{{ribbitCompleteId}}/cancel",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "ribbit",
+                "{{ribbitCompleteId}}",
+                "cancel"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Ribbit For Decline",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response contains created Ribbit\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "\r",
+                  "    pm.expect(json.ribbitId).to.exist;\r",
+                  "    pm.expect(json.relationshipId).to.eql(pm.collectionVariables.get(\"relationshipId\"));\r",
+                  "    pm.expect(json.senderUserId).to.eql(pm.collectionVariables.get(\"ribbitSenderUserAccountId\"));\r",
+                  "    pm.expect(json.receiverUserId).to.eql(pm.collectionVariables.get(\"ribbitReceiverUserAccountId\"));\r",
+                  "    pm.expect(json.type).to.eql(pm.collectionVariables.get(\"ribbitType\"));\r",
+                  "    pm.expect(json.status).to.eql(\"Sent\");\r",
+                  "    pm.expect(json.message).to.eql(pm.collectionVariables.get(\"ribbitDeclineMessage\"));\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Store Ribbit ID\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.collectionVariables.set(\"ribbitDeclineId\", json.ribbitId);\r",
+                  "    if (pm.environment.name) { pm.environment.set(\"ribbitDeclineId\", json.ribbitId); }\r",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ribbitSenderToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"receiverUserId\": \"{{ribbitReceiverUserAccountId}}\",\n  \"type\": \"{{ribbitType}}\",\n  \"message\": \"{{ribbitDeclineMessage}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/ribbit",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "ribbit"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Sender Cannot Decline Receiver Ribbit",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "exec": [
+                  "pm.test(\"Status code is 400 Bad Request\", function () {\r",
+                  "    pm.response.to.have.status(400);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response explains state change was blocked\", function () {\r",
+                  "    pm.expect(pm.response.text().toLowerCase()).to.include(\"unable\");\r",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ribbitSenderToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/ribbit/{{ribbitDeclineId}}/decline",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "ribbit",
+                "{{ribbitDeclineId}}",
+                "decline"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Decline Ribbit Success",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Ribbit status is Declined\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "\r",
+                  "    pm.expect(json.ribbitId).to.eql(pm.collectionVariables.get(\"ribbitDeclineId\"));\r",
+                  "    pm.expect(json.status).to.eql(\"Declined\");\r",
+                  "    pm.expect(json.declinedAt).to.exist;\r",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ribbitReceiverToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/ribbit/{{ribbitDeclineId}}/decline",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "ribbit",
+                "{{ribbitDeclineId}}",
+                "decline"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Declined Ribbit Cannot Be Completed",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "exec": [
+                  "pm.test(\"Status code is 400 Bad Request\", function () {\r",
+                  "    pm.response.to.have.status(400);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response explains state change was blocked\", function () {\r",
+                  "    pm.expect(pm.response.text().toLowerCase()).to.include(\"unable\");\r",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ribbitReceiverToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/ribbit/{{ribbitDeclineId}}/complete",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "ribbit",
+                "{{ribbitDeclineId}}",
+                "complete"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Ribbit For Cancel",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response contains created Ribbit\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "\r",
+                  "    pm.expect(json.ribbitId).to.exist;\r",
+                  "    pm.expect(json.relationshipId).to.eql(pm.collectionVariables.get(\"relationshipId\"));\r",
+                  "    pm.expect(json.senderUserId).to.eql(pm.collectionVariables.get(\"ribbitSenderUserAccountId\"));\r",
+                  "    pm.expect(json.receiverUserId).to.eql(pm.collectionVariables.get(\"ribbitReceiverUserAccountId\"));\r",
+                  "    pm.expect(json.type).to.eql(pm.collectionVariables.get(\"ribbitType\"));\r",
+                  "    pm.expect(json.status).to.eql(\"Sent\");\r",
+                  "    pm.expect(json.message).to.eql(pm.collectionVariables.get(\"ribbitCancelMessage\"));\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Store Ribbit ID\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.collectionVariables.set(\"ribbitCancelId\", json.ribbitId);\r",
+                  "    if (pm.environment.name) { pm.environment.set(\"ribbitCancelId\", json.ribbitId); }\r",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ribbitSenderToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"receiverUserId\": \"{{ribbitReceiverUserAccountId}}\",\n  \"type\": \"{{ribbitType}}\",\n  \"message\": \"{{ribbitCancelMessage}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/ribbit",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "ribbit"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Receiver Cannot Cancel Sender Ribbit",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "exec": [
+                  "pm.test(\"Status code is 400 Bad Request\", function () {\r",
+                  "    pm.response.to.have.status(400);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response explains state change was blocked\", function () {\r",
+                  "    pm.expect(pm.response.text().toLowerCase()).to.include(\"unable\");\r",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ribbitReceiverToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/ribbit/{{ribbitCancelId}}/cancel",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "ribbit",
+                "{{ribbitCancelId}}",
+                "cancel"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cancel Ribbit Success",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Ribbit status is Cancelled\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "\r",
+                  "    pm.expect(json.ribbitId).to.eql(pm.collectionVariables.get(\"ribbitCancelId\"));\r",
+                  "    pm.expect(json.status).to.eql(\"Cancelled\");\r",
+                  "    pm.expect(json.cancelledAt).to.exist;\r",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ribbitSenderToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/ribbit/{{ribbitCancelId}}/cancel",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "ribbit",
+                "{{ribbitCancelId}}",
+                "cancel"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cancelled Ribbit Cannot Be Declined",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "exec": [
+                  "pm.test(\"Status code is 400 Bad Request\", function () {\r",
+                  "    pm.response.to.have.status(400);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response explains state change was blocked\", function () {\r",
+                  "    pm.expect(pm.response.text().toLowerCase()).to.include(\"unable\");\r",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ribbitReceiverToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/ribbit/{{ribbitCancelId}}/decline",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "ribbit",
+                "{{ribbitCancelId}}",
+                "decline"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Receiver Active Ribbits Excludes Final States",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response is an array\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.expect(json).to.be.an(\"array\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Active Ribbits exclude final states\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "    const finalStatuses = [\"Completed\", \"Declined\", \"Cancelled\"];\r",
+                  "    pm.expect(json.every(ribbit => !finalStatuses.includes(ribbit.status))).to.eql(true);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Active Ribbits do not include completed, declined, or cancelled IDs\", function () {\r",
+                  "    const ids = pm.response.json().map(ribbit => ribbit.ribbitId);\r",
+                  "    pm.expect(ids).to.not.include(pm.collectionVariables.get(\"ribbitCompleteId\"));\r",
+                  "    pm.expect(ids).to.not.include(pm.collectionVariables.get(\"ribbitDeclineId\"));\r",
+                  "    pm.expect(ids).to.not.include(pm.collectionVariables.get(\"ribbitCancelId\"));\r",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ribbitReceiverToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/ribbit/active",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "ribbit",
+                "active"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Sender Sent Ribbits Includes Sent By Sender",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response is an array\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.expect(json).to.be.an(\"array\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Sent Ribbits are sent by logged-in sender\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "    const senderId = pm.collectionVariables.get(\"ribbitSenderUserAccountId\");\r",
+                  "    pm.expect(json.every(ribbit => ribbit.senderUserId === senderId)).to.eql(true);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Sent Ribbits include created Ribbit\", function () {\r",
+                  "    const ids = pm.response.json().map(ribbit => ribbit.ribbitId);\r",
+                  "    pm.expect(ids).to.include(pm.collectionVariables.get(\"ribbitId\"));\r",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ribbitSenderToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/ribbit/sent",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "ribbit",
+                "sent"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Active Ribbits Missing Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "exec": [
+                  "pm.test(\"Status code is 401 Unauthorized\", function () {\r",
+                  "    pm.response.to.have.status(401);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response says invalid or expired token\", function () {\r",
+                  "    pm.expect(pm.response.text()).to.include(\"Invalid or expired token\");\r",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/ribbit/active",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "ribbit",
+                "active"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Sent Ribbits Invalid Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "exec": [
+                  "pm.test(\"Status code is 401 Unauthorized\", function () {\r",
+                  "    pm.response.to.have.status(401);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response says invalid or expired token\", function () {\r",
+                  "    pm.expect(pm.response.text()).to.include(\"Invalid or expired token\");\r",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "fake-token",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/ribbit/sent",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "ribbit",
+                "sent"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
     }
   ],
   "event": [
@@ -2065,6 +4313,106 @@
     },
     {
       "key": "dailyCheckInId",
+      "value": ""
+    },
+    {
+      "key": "ribbitSenderUsername",
+      "value": "{{testUsername}}"
+    },
+    {
+      "key": "ribbitSenderPassword",
+      "value": "{{testPassword}}"
+    },
+    {
+      "key": "ribbitSenderToken",
+      "value": ""
+    },
+    {
+      "key": "ribbitSenderUserAccountId",
+      "value": ""
+    },
+    {
+      "key": "ribbitReceiverUsername",
+      "value": ""
+    },
+    {
+      "key": "ribbitReceiverPassword",
+      "value": ""
+    },
+    {
+      "key": "ribbitReceiverToken",
+      "value": ""
+    },
+    {
+      "key": "ribbitReceiverUserAccountId",
+      "value": ""
+    },
+    {
+      "key": "ribbitOutsiderUsername",
+      "value": ""
+    },
+    {
+      "key": "ribbitOutsiderPassword",
+      "value": ""
+    },
+    {
+      "key": "ribbitOutsiderToken",
+      "value": ""
+    },
+    {
+      "key": "ribbitOutsiderUserAccountId",
+      "value": ""
+    },
+    {
+      "key": "ribbitType",
+      "value": "GentleRequest"
+    },
+    {
+      "key": "ribbitMessage",
+      "value": "Could you send me a small check-in when you have a quiet moment?"
+    },
+    {
+      "key": "ribbitEmptyMessage",
+      "value": ""
+    },
+    {
+      "key": "ribbitAcknowledgementEmoji",
+      "value": "heart"
+    },
+    {
+      "key": "ribbitAcknowledgeMessage",
+      "value": "A tiny Ribbit for acknowledgement testing."
+    },
+    {
+      "key": "ribbitCompleteMessage",
+      "value": "A gentle request for completion testing."
+    },
+    {
+      "key": "ribbitDeclineMessage",
+      "value": "A gentle request for decline testing."
+    },
+    {
+      "key": "ribbitCancelMessage",
+      "value": "A gentle request for cancel testing."
+    },
+    {
+      "key": "ribbitId",
+      "value": ""
+    },
+    {
+      "key": "ribbitAcknowledgeId",
+      "value": ""
+    },
+    {
+      "key": "ribbitCompleteId",
+      "value": ""
+    },
+    {
+      "key": "ribbitDeclineId",
+      "value": ""
+    },
+    {
+      "key": "ribbitCancelId",
       "value": ""
     }
   ]
