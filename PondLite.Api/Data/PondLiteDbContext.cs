@@ -24,6 +24,10 @@ namespace PondLite.Api.Data
 
         public DbSet<Ribbit> Ribbits { get; set; }
 
+        public DbSet<DiscussionPrompt> DiscussionPrompts { get; set; }
+
+        public DbSet<DiscussionResponse> DiscussionResponses { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -152,6 +156,42 @@ namespace PondLite.Api.Data
                     ribbit.SenderUserId,
                     ribbit.Status
                 });
+
+            // - - -DiscussionPrompt- - -
+            modelBuilder.Entity<DiscussionPrompt>()
+                .HasOne(prompt => prompt.Relationship)
+                .WithMany()
+                .HasForeignKey(prompt => prompt.RelationshipId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<DiscussionPrompt>()
+                .HasIndex(prompt => new
+                {
+                    prompt.RelationshipId,
+                    prompt.PromptDate
+                })
+                .IsUnique();
+
+            // - - -DiscussionResponse- - -
+            modelBuilder.Entity<DiscussionResponse>()
+                .HasOne(response => response.DiscussionPrompt)
+                .WithMany(prompt => prompt.Responses)
+                .HasForeignKey(response => response.DiscussionPromptId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<DiscussionResponse>()
+                .HasOne(response => response.UserAccount)
+                .WithMany()
+                .HasForeignKey(response => response.UserAccountId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<DiscussionResponse>()
+                .HasIndex(response => new
+                {
+                    response.DiscussionPromptId,
+                    response.UserAccountId
+                })
+                .IsUnique();
         }
     }
 }

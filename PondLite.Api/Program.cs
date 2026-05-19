@@ -14,6 +14,7 @@ builder.Services.AddScoped<IRelationshipService, RelationshipService>();
 builder.Services.AddScoped<IFrogService, FrogService>();
 builder.Services.AddScoped<IDailyCheckInService, DailyCheckInService>();
 builder.Services.AddScoped<IRibbitService, RibbitService>();
+builder.Services.AddScoped<IDiscussionService, DiscussionService>();
 
 builder.Services.AddScoped<IUserAccountRepository, EfUserAccountRepository>();
 builder.Services.AddScoped<IAuthTokenRepository, EfAuthTokenRepository>();
@@ -28,6 +29,9 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.Converters.Add(
             new JsonStringEnumConverter());
     });
+builder.Services.AddScoped<IDiscussionPromptRepository, EfDiscussionPromptRepository>();
+builder.Services.AddScoped<IDiscussionResponseRepository, EfDiscussionResponseRepository>();
+
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
