@@ -109,21 +109,3 @@ For new models:
 5. Register the `DbSet` in `PondLiteDbContext`.
 6. Add Fluent API rules in `OnModelCreating` when needed.
 7. Add a migration and update the database.
-
-## Phase Notes
-
-Completed:
-
-- Phase 1: Authentication Foundation
-- Phase 2: Relationship/Pond Foundation
-
-Current endpoints include:
-
-- `POST /api/relationship/create`
-- `GET /api/relationship/mine`
-
-Next planned phase:
-
-- Phase 3: Frog Foundation
-
-Phase 3 should create one Frog per RelationshipMember.
