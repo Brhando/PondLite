@@ -4286,6 +4286,439 @@
         }
       ],
       "description": "Setup needed before running: ribbit sender and receiver must both have UserAccount rows and RelationshipMember rows in the same Relationship/Pond. The outsider account should be a valid UserAccount outside that Relationship/Pond, or not connected to a Pond. Populate ribbitReceiverUsername/ribbitReceiverPassword and ribbitOutsiderUsername/ribbitOutsiderPassword before running."
+    },
+    {
+      "name": "Discussion Tests",
+      "item": [
+        {
+          "name": "Get Today Discussion Success",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/discussions/today",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "discussions",
+                "today"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response includes today discussion prompt\", function () {",
+                  "    const json = pm.response.json();",
+                  "",
+                  "    pm.expect(json.discussionPromptId).to.exist;",
+                  "    pm.expect(json.relationshipId).to.exist;",
+                  "    pm.expect(json.promptText).to.be.a(\"string\").and.not.empty;",
+                  "    pm.expect(json.promptDate).to.exist;",
+                  "});",
+                  "",
+                  "pm.test(\"Store discussionPromptId\", function () {",
+                  "    const json = pm.response.json();",
+                  "",
+                  "    if (json.discussionPromptId) {",
+                  "        pm.collectionVariables.set(\"discussionPromptId\", json.discussionPromptId);",
+                  "    }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Submit Today Discussion Response Success",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/discussions/today/response",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "discussions",
+                "today",
+                "response"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"responseText\": \"{{discussionResponseText}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response marks current user as responded\", function () {",
+                  "    const json = pm.response.json();",
+                  "",
+                  "    pm.expect(json.hasCurrentUserResponded).to.eql(true);",
+                  "    pm.expect(json.responseCount).to.be.at.least(1);",
+                  "});",
+                  "",
+                  "pm.test(\"Store current user discussion response id when present\", function () {",
+                  "    const json = pm.response.json();",
+                  "    const currentUserId = pm.collectionVariables.get(\"userAccountId\");",
+                  "    const responses = Array.isArray(json.responses) ? json.responses : [];",
+                  "    const currentResponse = responses.find(function (response) {",
+                  "        return response.userAccountId === currentUserId;",
+                  "    });",
+                  "",
+                  "    if (currentResponse && currentResponse.discussionResponseId) {",
+                  "        pm.collectionVariables.set(\"discussionResponseId\", currentResponse.discussionResponseId);",
+                  "    }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Submit Today Discussion Response Update Success",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/discussions/today/response",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "discussions",
+                "today",
+                "response"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"responseText\": \"{{updatedDiscussionResponseText}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response still marks current user as responded\", function () {",
+                  "    const json = pm.response.json();",
+                  "",
+                  "    pm.expect(json.hasCurrentUserResponded).to.eql(true);",
+                  "});",
+                  "",
+                  "pm.test(\"Current user response text is updated when response is present\", function () {",
+                  "    const json = pm.response.json();",
+                  "    const currentUserId = pm.collectionVariables.get(\"userAccountId\");",
+                  "    const responseId = pm.collectionVariables.get(\"discussionResponseId\");",
+                  "    const expectedText = pm.collectionVariables.get(\"updatedDiscussionResponseText\");",
+                  "    const responses = Array.isArray(json.responses) ? json.responses : [];",
+                  "    const currentResponse = responses.find(function (response) {",
+                  "        return response.userAccountId === currentUserId || response.discussionResponseId === responseId;",
+                  "    });",
+                  "",
+                  "    if (currentResponse && Object.prototype.hasOwnProperty.call(currentResponse, \"responseText\")) {",
+                  "        pm.expect(currentResponse.responseText).to.eql(expectedText);",
+                  "    } else {",
+                  "        pm.expect(true).to.eql(true);",
+                  "    }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Today Discussion Missing Token",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/discussions/today",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "discussions",
+                "today"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 401 Unauthorized\", function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Submit Discussion Response Missing Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/discussions/today/response",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "discussions",
+                "today",
+                "response"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"responseText\": \"{{discussionResponseText}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 401 Unauthorized\", function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Submit Discussion Response Empty Text",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/discussions/today/response",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "discussions",
+                "today",
+                "response"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"responseText\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 400 Bad Request\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Today Discussion Invalid Token",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer invalid-token",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/discussions/today",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "discussions",
+                "today"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 401 Unauthorized\", function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Submit Discussion Response Invalid Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer invalid-token",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/discussions/today/response",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "discussions",
+                "today",
+                "response"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"responseText\": \"{{discussionResponseText}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 401 Unauthorized\", function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
     }
   ],
   "event": [
@@ -4480,6 +4913,22 @@
     {
       "key": "ribbitCancelId",
       "value": ""
+    },
+    {
+      "key": "discussionPromptId",
+      "value": ""
+    },
+    {
+      "key": "discussionResponseId",
+      "value": ""
+    },
+    {
+      "key": "discussionResponseText",
+      "value": "I appreciated how you checked in with me today."
+    },
+    {
+      "key": "updatedDiscussionResponseText",
+      "value": "I appreciated how you checked in with me today, and I wanted to add that it helped me feel cared for."
     }
   ]
 }

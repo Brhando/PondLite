@@ -25,10 +25,11 @@ Completed:
 - Phase 3: Frog Foundation
 - Phase 4: Daily Check-In
 - Phase 5: Ribbits / Gentle Reminders
+- Phase 6: Discussion Prompts
 
 Next planned phase:
 
-- Phase 6: Discussion Prompts
+- Phase 7: Bug-Themed Gift System
 
 There is no frontend yet.
 
@@ -209,6 +210,39 @@ Current Ribbit statuses:
 
 `Completed`, `Declined`, and `Cancelled` are final states.
 
+### DiscussionPrompt
+
+Represents one shared discussion prompt for a Relationship/Pond on a specific
+day.
+
+- `DiscussionPromptId`
+- `RelationshipId`
+- `PromptText`
+- `PromptDate`
+- `CreatedAt`
+- `Relationship`
+- `Responses`
+
+Discussion prompts are unique by `RelationshipId` and `PromptDate`, so a Pond
+gets one shared prompt per day.
+
+### DiscussionResponse
+
+Represents one PondMate's response to a discussion prompt.
+
+- `DiscussionResponseId`
+- `DiscussionPromptId`
+- `UserAccountId`
+- `ResponseText`
+- `CreatedAt`
+- `UpdatedAt`
+- `DiscussionPrompt`
+- `UserAccount`
+
+Discussion responses are unique by `DiscussionPromptId` and `UserAccountId`, so
+each PondMate can have one response per prompt. Submitting again updates that
+PondMate's existing response.
+
 ---
 
 ## Implemented Endpoints
@@ -370,6 +404,41 @@ Ribbit rules currently enforced by the backend:
 - Completed, declined, and cancelled Ribbits are final states.
 - Active Ribbits exclude completed, declined, and cancelled Ribbits.
 
+### Discussion Prompts
+
+```http
+GET  /api/discussions/today
+POST /api/discussions/today/response
+```
+
+`GET /api/discussions/today` returns today's shared prompt for the authenticated
+PondMate's active Pond. If today's prompt does not exist yet, the backend creates
+one for that Pond and date.
+
+`POST /api/discussions/today/response` creates or updates the authenticated
+PondMate's response to today's prompt.
+
+Example response body:
+
+```json
+{
+  "responseText": "I appreciated how you checked in with me today."
+}
+```
+
+Discussion prompt rules currently enforced by the backend:
+
+- Auth is required for Discussion endpoints.
+- The prompt is scoped to the authenticated user's active Relationship/Pond.
+- Empty response text is rejected.
+- One response is stored per user per prompt.
+- Submitting a second response updates the existing response instead of creating
+  a duplicate.
+
+Discussion prompt status responses include the prompt, response count, expected
+response count, whether the current user has responded, and the current prompt's
+responses.
+
 Protected endpoints use:
 
 ```http
@@ -499,9 +568,9 @@ Bearer token -> UserAccount -> RelationshipMember -> Relationship -> Ribbit
 Ribbits are only valid when sender and receiver are both PondMates in the same
 Relationship/Pond.
 
-### Phase 6: Discussion Prompts - Next
+### Phase 6: Discussion Prompts - Complete
 
-Planned:
+Implemented:
 
 - `DiscussionPrompt` model
 - `DiscussionResponse` model
@@ -510,6 +579,21 @@ Planned:
 - Retrieve responses for the current prompt
 - Track prompt response status for PondMates
 - Unique response rule per prompt and user
+- Update existing response when the same PondMate submits again
+- Auth checks for Discussion endpoints
+- Empty response validation
+- EF migration, unique constraints, and delete behavior
+- Postman tests for retrieval, response creation, response update, missing token,
+  invalid token, and empty response text
+
+Discussion prompt privacy path:
+
+```text
+Bearer token -> UserAccount -> RelationshipMember -> Relationship -> DiscussionPrompt
+```
+
+Discussion prompts are scoped through the authenticated user's active Pond
+rather than accepting arbitrary Relationship IDs from the client.
 
 ---
 
@@ -539,6 +623,9 @@ Recommended high-level test order:
 14. Create Ribbits between PondMates
 15. Acknowledge, complete, decline, and cancel Ribbits
 16. Confirm Ribbit access and final-state rules
+17. Get today's Discussion Prompt
+18. Submit and update today's Discussion response
+19. Confirm Discussion authorization and validation rules
 
 The collection uses variables such as:
 
@@ -558,6 +645,10 @@ The collection uses variables such as:
 - `ribbitReceiverUserAccountId`
 - `ribbitOutsiderUserAccountId`
 - `ribbitId`
+- `discussionPromptId`
+- `discussionResponseId`
+- `discussionResponseText`
+- `updatedDiscussionResponseText`
 
 ---
 
